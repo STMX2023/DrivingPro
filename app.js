@@ -144,9 +144,13 @@ class DrivingProApp {
     setupPWA() {
         // Register service worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
+            navigator.serviceWorker.register('./sw.js?v=1.1.0')
                 .then(registration => {
                     console.log('SW registered successfully');
+                    // Force update if there's a waiting service worker
+                    if (registration.waiting) {
+                        registration.waiting.postMessage({command: 'skipWaiting'});
+                    }
                 })
                 .catch(error => {
                     console.log('SW registration failed');
