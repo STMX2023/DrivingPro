@@ -4,11 +4,14 @@ class DrivingProApp {
         this.currentTab = 'home';
         this.timeData = {};
         this.timeBasedCards = new Map();
+        this.locationData = {};
+        this.locationWatchId = null;
         this.init();
     }
 
     init() {
         this.initializeTimeSystem();
+        this.initializeLocationSystem();
         this.setupEventListeners();
         this.setupPWA();
         this.animateCards();
@@ -283,6 +286,178 @@ class DrivingProApp {
         return this.timeData;
     }
 
+    // ===== LOCATION SYSTEM =====
+    async initializeLocationSystem() {
+        this.setupLocationDisplay();
+        await this.requestLocationPermission();
+        this.startLocationTracking();
+    }
+
+    setupLocationDisplay() {
+        const locationText = document.getElementById('locationText');
+        if (locationText) {
+            locationText.textContent = 'Obtendo...';
+        }
+    }
+
+    async requestLocationPermission() {
+        if (!navigator.geolocation) {
+            this.updateLocationDisplay('GPS não disponível');
+            console.error('Geolocation not supported');
+            return false;
+        }
+
+        try {
+            // Check current permission state
+            const permission = await navigator.permissions.query({name: 'geolocation'});
+            
+            if (permission.state === 'granted') {
+                console.log('Location permission already granted');
+                return true;
+            } else if (permission.state === 'prompt') {
+                console.log('Will prompt for location permission');
+                return true;
+            } else {
+                this.updateLocationDisplay('Permissão negada');
+                console.log('Location permission denied');
+                return false;
+            }
+        } catch (error) {
+            console.log('Permission API not supported, will try direct access');
+            return true;
+        }
+    }
+
+    startLocationTracking() {
+        if (!navigator.geolocation) {
+            this.updateLocationDisplay('GPS não suportado');
+            return;
+        }
+
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000 // 1 minute cache
+        };
+
+        // Get initial position
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.handleLocationSuccess(position);
+                this.startLocationWatch(options);
+            },
+            (error) => {
+                this.handleLocationError(error);
+            },
+            options
+        );
+    }
+
+    startLocationWatch(options) {
+        // Watch position changes every minute
+        this.locationWatchId = navigator.geolocation.watchPosition(
+            (position) => {
+                this.handleLocationSuccess(position);
+            },
+            (error) => {
+                this.handleLocationError(error);
+            },
+            options
+        );
+
+        console.log('Location tracking started with watchId:', this.locationWatchId);
+    }
+
+    handleLocationSuccess(position) {
+        const { latitude, longitude, accuracy } = position.coords;
+        const timestamp = new Date(position.timestamp);
+
+        this.locationData = {
+            latitude: latitude,
+            longitude: longitude,
+            accuracy: Math.round(accuracy),
+            timestamp: timestamp,
+            formattedCoords: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+            lastUpdate: timestamp.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            })
+        };
+
+        this.updateLocationDisplay();
+        
+        console.log('Location updated:', this.locationData);
+    }
+
+    handleLocationError(error) {
+        let errorMessage = 'Erro GPS';
+        
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage = 'Permissão negada';
+                console.error('Location permission denied by user');
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage = 'GPS indisponível';
+                console.error('Location information unavailable');
+                break;
+            case error.TIMEOUT:
+                errorMessage = 'Timeout GPS';
+                console.error('Location request timeout');
+                break;
+            default:
+                errorMessage = 'Erro desconhecido';
+                console.error('Unknown location error');
+                break;
+        }
+
+        this.updateLocationDisplay(errorMessage);
+    }
+
+    updateLocationDisplay(errorMessage = null) {
+        const locationText = document.getElementById('locationText');
+        if (!locationText) return;
+
+        if (errorMessage) {
+            locationText.textContent = errorMessage;
+            locationText.style.color = 'var(--danger)';
+        } else if (this.locationData.formattedCoords) {
+            locationText.textContent = this.locationData.formattedCoords;
+            locationText.style.color = 'var(--text-secondary)';
+            locationText.title = `Precisão: ${this.locationData.accuracy}m - Última atualização: ${this.locationData.lastUpdate}`;
+        }
+    }
+
+    // Stop location tracking (for cleanup)
+    stopLocationTracking() {
+        if (this.locationWatchId !== null) {
+            navigator.geolocation.clearWatch(this.locationWatchId);
+            this.locationWatchId = null;
+            console.log('Location tracking stopped');
+        }
+    }
+
+    // Public method to get current location data
+    getLocationData() {
+        return this.locationData;
+    }
+
+    // Public method to manually refresh location
+    refreshLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => this.handleLocationSuccess(position),
+                (error) => this.handleLocationError(error),
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0 // Force fresh location
+                }
+            );
+        }
+    }
+
     setupEventListeners() {
         // Tab navigation
         const navItems = document.querySelectorAll('.nav-item');
@@ -416,7 +591,7 @@ class DrivingProApp {
     setupPWA() {
         // Register service worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=1.2.0')
+            navigator.serviceWorker.register('./sw.js?v=1.3.0')
                 .then(registration => {
                     console.log('SW registered successfully');
                     // Force update if there's a waiting service worker
