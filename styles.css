@@ -144,7 +144,7 @@ body {
 .main-content {
     flex: 1;
     padding: var(--spacing-lg);
-    padding-bottom: calc(var(--spacing-xl) + 80px);
+    padding-bottom: calc(var(--spacing-xl) + 120px + env(safe-area-inset-bottom, 20px));
     overflow-y: auto;
 }
 
@@ -173,6 +173,7 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
 }
 
 @media (min-width: 390px) {
@@ -374,6 +375,7 @@ body {
 @media (max-width: 375px) {
     .main-content {
         padding: var(--spacing-md);
+        padding-bottom: calc(var(--spacing-xl) + 130px + env(safe-area-inset-bottom, 25px));
     }
     
     .card {
