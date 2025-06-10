@@ -2,14 +2,14 @@
     "name": "DrivingPro - Uber Driver Assistant",
     "short_name": "DrivingPro",
     "description": "Your comprehensive Uber driver assistance companion with navigation tools, earnings tracking, and driver insights.",
-    "start_url": "/",
+    "start_url": "/DrivingPro/",
     "display": "standalone",
     "background_color": "#F2F2F7",
     "theme_color": "#007AFF",
     "orientation": "portrait-primary",
     "categories": ["education", "lifestyle", "utilities"],
     "lang": "en-US",
-    "scope": "/",
+    "scope": "/DrivingPro/",
     "icons": [
         {
             "src": "icons/icon-72x72.png",
@@ -87,7 +87,7 @@
             "name": "Quick Test",
             "short_name": "Quick Test",
             "description": "Start a quick 5-minute practice test",
-            "url": "/?shortcut=quick-test",
+            "url": "/DrivingPro/?shortcut=quick-test",
             "icons": [
                 {
                     "src": "icons/shortcut-quick-test.png",
@@ -100,7 +100,7 @@
             "name": "Study Materials",
             "short_name": "Study",
             "description": "Access driving theory materials",
-            "url": "/?shortcut=study",
+            "url": "/DrivingPro/?shortcut=study",
             "icons": [
                 {
                     "src": "icons/shortcut-study.png",
@@ -113,7 +113,7 @@
             "name": "Progress",
             "short_name": "Progress",
             "description": "View your learning progress",
-            "url": "/?shortcut=progress",
+            "url": "/DrivingPro/?shortcut=progress",
             "icons": [
                 {
                     "src": "icons/shortcut-progress.png",
