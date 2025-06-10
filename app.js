@@ -2,13 +2,285 @@
 class DrivingProApp {
     constructor() {
         this.currentTab = 'home';
+        this.timeData = {};
+        this.timeBasedCards = new Map();
         this.init();
     }
 
     init() {
+        this.initializeTimeSystem();
         this.setupEventListeners();
         this.setupPWA();
         this.animateCards();
+    }
+
+    // ===== TIME SYSTEM =====
+    async initializeTimeSystem() {
+        await this.getUserLocationTime();
+        this.setupTimeBasedCards();
+        this.startTimeUpdates();
+        this.updateDynamicContent();
+    }
+
+    async getUserLocationTime() {
+        try {
+            // Get user's timezone automatically
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const now = new Date();
+            
+            this.timeData = {
+                timezone: timezone,
+                currentTime: now,
+                hour: now.getHours(),
+                minute: now.getMinutes(),
+                dayOfWeek: now.getDay(), // 0 = Sunday, 1 = Monday, etc.
+                dayName: now.toLocaleDateString('en-US', { weekday: 'long' }),
+                date: now.getDate(),
+                month: now.getMonth() + 1,
+                year: now.getFullYear(),
+                monthName: now.toLocaleDateString('en-US', { month: 'long' }),
+                formattedDate: now.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                formattedTime: now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }),
+                timeOfDay: this.getTimeOfDay(now.getHours()),
+                isWeekend: now.getDay() === 0 || now.getDay() === 6,
+                isBusinessHours: now.getHours() >= 6 && now.getHours() <= 22
+            };
+
+            console.log('Time System Initialized:', this.timeData);
+            
+        } catch (error) {
+            console.error('Error getting user location time:', error);
+            // Fallback to basic time
+            this.timeData = {
+                timezone: 'UTC',
+                currentTime: new Date(),
+                hour: new Date().getHours(),
+                timeOfDay: this.getTimeOfDay(new Date().getHours())
+            };
+        }
+    }
+
+    getTimeOfDay(hour) {
+        if (hour >= 5 && hour < 12) return 'morning';
+        if (hour >= 12 && hour < 17) return 'afternoon';
+        if (hour >= 17 && hour < 21) return 'evening';
+        return 'night';
+    }
+
+    setupTimeBasedCards() {
+        // Define time-sensitive cards and their visibility rules
+        this.timeBasedCards.set('morning-boost', {
+            timeRange: { start: 6, end: 10 },
+            weekdays: [1, 2, 3, 4, 5], // Monday to Friday
+            title: '🌅 Morning Rush Boost',
+            description: 'Peak demand time! Higher surge rates expected in business districts.',
+            badge: 'Hot Zones',
+            cardType: 'dynamic'
+        });
+
+        this.timeBasedCards.set('lunch-peak', {
+            timeRange: { start: 11, end: 14 },
+            weekdays: [1, 2, 3, 4, 5],
+            title: '🍽️ Lunch Peak Hours',
+            description: 'Restaurant and office areas showing high demand.',
+            badge: 'Lunch Rush',
+            cardType: 'dynamic'
+        });
+
+        this.timeBasedCards.set('evening-surge', {
+            timeRange: { start: 17, end: 20 },
+            weekdays: [1, 2, 3, 4, 5],
+            title: '🌆 Evening Commute',
+            description: 'Premium rates active near transit hubs and residential areas.',
+            badge: 'Prime Time',
+            cardType: 'dynamic'
+        });
+
+        this.timeBasedCards.set('weekend-leisure', {
+            timeRange: { start: 10, end: 23 },
+            weekdays: [0, 6], // Weekend
+            title: '🎉 Weekend Hotspots',
+            description: 'Entertainment districts and shopping centers have increased activity.',
+            badge: 'Weekend Boost',
+            cardType: 'dynamic'
+        });
+
+        this.timeBasedCards.set('late-night', {
+            timeRange: { start: 22, end: 5 },
+            weekdays: [0, 1, 2, 3, 4, 5, 6],
+            title: '🌙 Night Shift Premium',
+            description: 'Airport runs and late-night venues offer bonus rates.',
+            badge: 'Night Premium',
+            cardType: 'dynamic'
+        });
+    }
+
+    startTimeUpdates() {
+        // Update time every minute
+        setInterval(() => {
+            this.getUserLocationTime().then(() => {
+                this.updateDynamicContent();
+                this.updateTimeBasedCards();
+            });
+        }, 60000); // 60 seconds
+
+        // Initial update
+        this.updateTimeBasedCards();
+    }
+
+    updateDynamicContent() {
+        // Update any time-sensitive text content
+        this.updateGreeting();
+        this.updateDateDisplay();
+        this.updateEarningsBasedOnTime();
+    }
+
+    updateGreeting() {
+        const headerTitle = document.querySelector('.header-title');
+        if (headerTitle) {
+            let greeting = '';
+            switch(this.timeData.timeOfDay) {
+                case 'morning':
+                    greeting = 'Good Morning';
+                    break;
+                case 'afternoon':
+                    greeting = 'Good Afternoon';
+                    break;
+                case 'evening':
+                    greeting = 'Good Evening';
+                    break;
+                case 'night':
+                    greeting = 'Good Night';
+                    break;
+            }
+            // You can optionally change the header or add a subtitle
+            // headerTitle.textContent = `${greeting} - DrivingPro`;
+        }
+    }
+
+    updateDateDisplay() {
+        // Add current date/time info to cards if needed
+        const profileCard = document.querySelector('.profile-card .card-description');
+        if (profileCard) {
+            profileCard.textContent = `Active since ${this.timeData.formattedDate}`;
+        }
+    }
+
+    updateEarningsBasedOnTime() {
+        // Update earnings display based on time of day
+        const earningsCard = document.querySelector('.stats-card .stats-number');
+        if (earningsCard && earningsCard.textContent.includes('$247')) {
+            // Simulate dynamic earnings based on time
+            let baseEarnings = 247;
+            if (this.timeData.timeOfDay === 'morning') baseEarnings += 23;
+            if (this.timeData.timeOfDay === 'evening') baseEarnings += 45;
+            if (this.timeData.isWeekend) baseEarnings += 67;
+            
+            earningsCard.textContent = `$${baseEarnings}.${Math.floor(Math.random() * 99).toString().padStart(2, '0')}`;
+        }
+    }
+
+    updateTimeBasedCards() {
+        const currentHour = this.timeData.hour;
+        const currentDay = this.timeData.dayOfWeek;
+
+        // Check which time-based cards should be visible
+        for (const [cardId, cardConfig] of this.timeBasedCards) {
+            const shouldShow = this.shouldShowTimeBasedCard(cardConfig, currentHour, currentDay);
+            
+            if (shouldShow) {
+                this.showTimeBasedCard(cardId, cardConfig);
+            } else {
+                this.hideTimeBasedCard(cardId);
+            }
+        }
+    }
+
+    shouldShowTimeBasedCard(cardConfig, currentHour, currentDay) {
+        // Check if current time is within the card's time range
+        const { start, end } = cardConfig.timeRange;
+        const timeMatch = (start <= end) 
+            ? currentHour >= start && currentHour < end
+            : currentHour >= start || currentHour < end; // For ranges that cross midnight
+
+        // Check if current day is in the card's weekdays
+        const dayMatch = cardConfig.weekdays.includes(currentDay);
+
+        return timeMatch && dayMatch;
+    }
+
+    showTimeBasedCard(cardId, cardConfig) {
+        // Check if card already exists
+        let existingCard = document.getElementById(`time-card-${cardId}`);
+        
+        if (!existingCard) {
+            // Create new time-based card
+            const cardHTML = `
+                <div class="card" id="time-card-${cardId}">
+                    <div class="card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">${cardConfig.title}</h3>
+                    <p class="card-description">${cardConfig.description}</p>
+                    <div class="card-badge">${cardConfig.badge}</div>
+                </div>
+            `;
+
+            // Insert into home card grid (first position)
+            const homeCardGrid = document.querySelector('#home .card-grid');
+            if (homeCardGrid) {
+                homeCardGrid.insertAdjacentHTML('afterbegin', cardHTML);
+                
+                // Animate the new card
+                const newCard = document.getElementById(`time-card-${cardId}`);
+                newCard.style.opacity = '0';
+                newCard.style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    newCard.classList.add('slide-up');
+                    newCard.style.opacity = '1';
+                    newCard.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        }
+    }
+
+    hideTimeBasedCard(cardId) {
+        const card = document.getElementById(`time-card-${cardId}`);
+        if (card) {
+            // Animate out
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                card.remove();
+            }, 300);
+        }
+    }
+
+    // Public method to get current time data
+    getTimeData() {
+        return this.timeData;
+    }
+
+    // Public method to manually refresh time
+    async refreshTime() {
+        await this.getUserLocationTime();
+        this.updateDynamicContent();
+        this.updateTimeBasedCards();
+        return this.timeData;
     }
 
     setupEventListeners() {
@@ -144,7 +416,7 @@ class DrivingProApp {
     setupPWA() {
         // Register service worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=1.1.0')
+            navigator.serviceWorker.register('./sw.js?v=1.2.0')
                 .then(registration => {
                     console.log('SW registered successfully');
                     // Force update if there's a waiting service worker

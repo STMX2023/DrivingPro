@@ -1,7 +1,7 @@
 // Service Worker for DrivingPro PWA
-const CACHE_NAME = 'drivingpro-v1.1.0';
-const STATIC_CACHE = 'drivingpro-static-v1.1.0';
-const DYNAMIC_CACHE = 'drivingpro-dynamic-v1.1.0';
+const CACHE_NAME = 'drivingpro-v1.2.0';
+const STATIC_CACHE = 'drivingpro-static-v1.2.0';
+const DYNAMIC_CACHE = 'drivingpro-dynamic-v1.2.0';
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
