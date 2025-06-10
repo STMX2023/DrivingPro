@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DrivingPro</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="DrivingPro">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">DrivingPro</h1>
+            <div class="header-actions">
+                <button class="header-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 6V4M12 6C10.8954 6 10 6.89543 10 8C10 9.10457 10.8954 10 12 10C13.1046 10 14 9.10457 14 8C14 6.89543 13.1046 6 12 6ZM12 10V20M8 8H4M20 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-section active" id="home">
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">🚗</div>
+                        <h3 class="card-title">Practice Tests</h3>
+                        <p class="card-description">Take comprehensive driving tests to improve your skills</p>
+                        <div class="card-badge">12 Available</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📖</div>
+                        <h3 class="card-title">Study Materials</h3>
+                        <p class="card-description">Access driving theory and practical guides</p>
+                        <div class="card-badge">New Content</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <h3 class="card-title">Progress Tracking</h3>
+                        <p class="card-description">Monitor your learning progress and achievements</p>
+                        <div class="card-badge">85% Complete</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🎯</div>
+                        <h3 class="card-title">Goals & Challenges</h3>
+                        <p class="card-description">Set personal goals and complete daily challenges</p>
+                        <div class="card-badge">3 Active</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="practice">
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">⚡</div>
+                        <h3 class="card-title">Quick Test</h3>
+                        <p class="card-description">5-minute practice session</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🔄</div>
+                        <h3 class="card-title">Full Mock Test</h3>
+                        <p class="card-description">Complete driving theory test simulation</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="stats">
+                <div class="card-grid">
+                    <div class="card stats-card">
+                        <div class="stats-number">85%</div>
+                        <p class="stats-label">Average Score</p>
+                    </div>
+                    
+                    <div class="card stats-card">
+                        <div class="stats-number">47</div>
+                        <p class="stats-label">Tests Completed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="profile">
+                <div class="card-grid">
+                    <div class="card profile-card">
+                        <div class="profile-avatar">👤</div>
+                        <h3 class="card-title">John Doe</h3>
+                        <p class="card-description">Learner Driver</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="home">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 9L12 2L21 9V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="nav-label">Home</span>
+            </button>
+            
+            <button class="nav-item" data-tab="practice">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M14.7 6.3C16.2 7.8 17 9.8 17 12S16.2 16.2 14.7 17.7L13.3 16.3C14.3 15.3 14.8 13.7 14.8 12S14.3 8.7 13.3 7.7L14.7 6.3Z" fill="currentColor"/>
+                    <path d="M9.3 17.7C7.8 16.2 7 14.2 7 12S7.8 7.8 9.3 6.3L10.7 7.7C9.7 8.7 9.2 10.3 9.2 12S9.7 15.3 10.7 16.3L9.3 17.7Z" fill="currentColor"/>
+                </svg>
+                <span class="nav-label">Practice</span>
+            </button>
+            
+            <button class="nav-item" data-tab="stats">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 11H15V18H9V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M3 18V12H6V18H3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18 18V6H21V18H18Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="nav-label">Stats</span>
+            </button>
+            
+            <button class="nav-item" data-tab="profile">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="nav-label">Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 
