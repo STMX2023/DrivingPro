@@ -1,7 +1,7 @@
 {
-    "name": "DrivingPro - Driving Test Companion",
+    "name": "DrivingPro - Uber Driver Assistant",
     "short_name": "DrivingPro",
-    "description": "Your comprehensive driving test preparation companion with practice tests, study materials, and progress tracking.",
+    "description": "Your comprehensive Uber driver assistance companion with navigation tools, earnings tracking, and driver insights.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#F2F2F7",

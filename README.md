@@ -1,6 +1,6 @@
 # DrivingPro PWA
 
-A sleek, iOS-style Progressive Web App for driving test preparation and practice.
+A sleek, iOS-style Progressive Web App for Uber driver assistance and optimization.
 
 ## Features
 
