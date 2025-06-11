@@ -546,12 +546,20 @@ body {
     transform: translateY(-2px) scale(1.05);
 }
 
+.nav-item:hover .nav-icon {
+    transform: scale(1.15);
+}
+
+.nav-item:hover .nav-label {
+    transform: scale(1.05);
+}
+
 .nav-item:active {
     transform: translateY(0) scale(0.95);
 }
 
 .nav-icon {
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
     margin-bottom: var(--space-1);
     transition: all 0.3s var(--ease-out-cubic);
     position: relative;
@@ -561,7 +569,7 @@ body {
 
 .nav-label {
     font-size: var(--text-xs);
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
     font-weight: var(--font-medium);
     transition: all 0.3s var(--ease-out-cubic);
     letter-spacing: var(--tracking-wide);
@@ -571,17 +579,14 @@ body {
 
 .nav-item.active .nav-icon {
     color: var(--primary);
-    transform: scale(1.2);
-    filter: drop-shadow(var(--glow-primary));
+    transform: scale(1.4);
+    filter: drop-shadow(0 0 6px rgba(102, 126, 234, 0.5));
 }
 
 .nav-item.active .nav-label {
     color: var(--primary);
     font-weight: var(--font-bold);
-}
-
-.nav-item.active::before {
-    opacity: 0.15;
+    transform: scale(1.1);
 }
 
 /* Responsive Enhancements */
@@ -902,15 +907,23 @@ body {
 }
 
 [data-theme="dark"] .nav-item {
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
 }
 
-[data-theme="dark"] .nav-item.active {
+[data-theme="dark"] .nav-item.active .nav-icon {
     color: var(--primary);
+    transform: scale(1.4);
+    filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
+}
+
+[data-theme="dark"] .nav-item.active .nav-label {
+    color: var(--primary);
+    font-weight: var(--font-bold);
+    transform: scale(1.1);
 }
 
 [data-theme="dark"] .nav-item:hover {
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .nav-icon {
@@ -991,15 +1004,23 @@ body {
     }
     
     :root:not([data-theme]) .nav-item {
-        color: var(--text-tertiary);
+        color: var(--text-secondary);
     }
     
-    :root:not([data-theme]) .nav-item.active {
+    :root:not([data-theme]) .nav-item.active .nav-icon {
         color: var(--primary);
+        transform: scale(1.4);
+        filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
+    }
+    
+    :root:not([data-theme]) .nav-item.active .nav-label {
+        color: var(--primary);
+        font-weight: var(--font-bold);
+        transform: scale(1.1);
     }
     
     :root:not([data-theme]) .nav-item:hover {
-        color: var(--text-secondary);
+        color: var(--text-primary);
     }
     
     :root:not([data-theme]) .nav-icon {
