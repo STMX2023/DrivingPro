@@ -155,7 +155,7 @@ body {
     font-weight: var(--font-normal);
     line-height: var(--leading-normal);
     color: var(--text-primary);
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--bg-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -225,7 +225,7 @@ body {
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-overlay);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-md);
@@ -242,7 +242,7 @@ body {
 }
 
 .location-display:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--surface-raised);
     border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
 }
@@ -265,7 +265,7 @@ body {
     height: 44px;
     border: none;
     border-radius: var(--radius-xl);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-raised);
     backdrop-filter: blur(16px);
     color: var(--text-primary);
     display: flex;
@@ -276,6 +276,7 @@ body {
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-btn::before {
@@ -901,6 +902,70 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Dark mode specific overrides */
+[data-theme="dark"] body {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .header {
+    background: var(--surface-overlay);
+    border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .header-btn {
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    border: 1px solid rgba(224, 224, 224, 0.15);
+}
+
+[data-theme="dark"] .header-btn:hover {
+    background: var(--surface-overlay);
+}
+
+[data-theme="dark"] .location-display {
+    background: var(--surface-overlay);
+    color: var(--text-secondary);
+    border: 1px solid rgba(224, 224, 224, 0.15);
+}
+
+[data-theme="dark"] .location-display:hover {
+    background: var(--surface-raised);
+    border-color: rgba(224, 224, 224, 0.25);
+}
+
+[data-theme="dark"] .location-display svg {
+    color: var(--accent);
+}
+
+[data-theme="dark"] .bottom-nav {
+    background: var(--surface-overlay);
+    border-top: 1px solid rgba(68, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .nav-item {
+    color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .nav-item.active {
+    color: var(--primary);
+}
+
+[data-theme="dark"] .nav-item:hover {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .nav-icon {
+    color: inherit;
+}
+
+[data-theme="dark"] .nav-label {
+    color: inherit;
+}
+
+[data-theme="dark"] .main-content {
+    background: var(--bg-primary);
+}
+
 /* Auto theme adjustments */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) .theme-switcher {
@@ -910,6 +975,70 @@ body {
     
     :root:not([data-theme]) .theme-btn:hover {
         background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Auto dark mode overrides */
+    :root:not([data-theme]) body {
+        background: var(--bg-primary);
+    }
+    
+    :root:not([data-theme]) .header {
+        background: var(--surface-overlay);
+        border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+    }
+    
+    :root:not([data-theme]) .header-btn {
+        background: var(--surface-raised);
+        color: var(--text-primary);
+        border: 1px solid rgba(224, 224, 224, 0.15);
+    }
+    
+    :root:not([data-theme]) .header-btn:hover {
+        background: var(--surface-overlay);
+    }
+    
+    :root:not([data-theme]) .location-display {
+        background: var(--surface-overlay);
+        color: var(--text-secondary);
+        border: 1px solid rgba(224, 224, 224, 0.15);
+    }
+    
+    :root:not([data-theme]) .location-display:hover {
+        background: var(--surface-raised);
+        border-color: rgba(224, 224, 224, 0.25);
+    }
+    
+    :root:not([data-theme]) .location-display svg {
+        color: var(--accent);
+    }
+    
+    :root:not([data-theme]) .bottom-nav {
+        background: var(--surface-overlay);
+        border-top: 1px solid rgba(68, 68, 68, 0.3);
+    }
+    
+    :root:not([data-theme]) .nav-item {
+        color: var(--text-tertiary);
+    }
+    
+    :root:not([data-theme]) .nav-item.active {
+        color: var(--primary);
+    }
+    
+    :root:not([data-theme]) .nav-item:hover {
+        color: var(--text-secondary);
+    }
+    
+    :root:not([data-theme]) .nav-icon {
+        color: inherit;
+    }
+    
+    :root:not([data-theme]) .nav-label {
+        color: inherit;
+    }
+    
+    :root:not([data-theme]) .main-content {
+        background: var(--bg-primary);
     }
 }
 
