@@ -1064,8 +1064,8 @@ body {
 
 .update-card.success {
     pointer-events: none;
-    background: var(--surface-raised);
-    border-color: rgba(102, 126, 234, 0.2);
+    background: transparent;
+    border-color: transparent;
 }
 
 .update-card.error {
@@ -1137,8 +1137,8 @@ body {
 }
 
 [data-theme="dark"] .update-card.success {
-    background: var(--surface-raised);
-    border-color: rgba(102, 126, 234, 0.3);
+    background: transparent;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .update-card.error {
@@ -1156,8 +1156,8 @@ body {
     }
     
     :root:not([data-theme]) .update-card.success {
-        background: var(--surface-raised);
-        border-color: rgba(102, 126, 234, 0.3);
+        background: transparent;
+        border-color: transparent;
     }
     
     :root:not([data-theme]) .update-card.error {
