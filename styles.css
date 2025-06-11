@@ -1059,7 +1059,8 @@ body {
 
 .update-card.loading {
     pointer-events: none;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    background: transparent;
+    border-color: transparent;
 }
 
 .update-card.success {
@@ -1133,7 +1134,8 @@ body {
 
 /* Dark theme adjustments for update card */
 [data-theme="dark"] .update-card.loading {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    background: transparent;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .update-card.success {
@@ -1152,7 +1154,8 @@ body {
 /* Auto theme adjustments */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) .update-card.loading {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        background: transparent;
+        border-color: transparent;
     }
     
     :root:not([data-theme]) .update-card.success {
