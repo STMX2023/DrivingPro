@@ -489,6 +489,7 @@ class DrivingProApp {
             mediaQuery.addEventListener('change', () => {
                 if (this.currentTheme === 'auto') {
                     this.applyTheme('auto');
+                    this.updateThemeColor('auto');
                 }
             });
         }
@@ -512,6 +513,9 @@ class DrivingProApp {
         // Remove existing theme attributes
         documentElement.removeAttribute('data-theme');
         
+        // Update theme color meta tag to match background
+        this.updateThemeColor(theme);
+        
         switch (theme) {
             case 'light':
                 // Light theme is default, no attribute needed
@@ -524,6 +528,26 @@ class DrivingProApp {
                 // The CSS will automatically apply dark theme if system prefers dark
                 break;
         }
+    }
+
+    updateThemeColor(theme) {
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        if (!themeColorMeta) return;
+        
+        let backgroundColor;
+        
+        if (theme === 'dark') {
+            backgroundColor = '#121212'; // Dark mode background
+        } else if (theme === 'light') {
+            backgroundColor = '#ffffff'; // Light mode background
+        } else if (theme === 'auto') {
+            // Check system preference
+            const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            backgroundColor = isDarkMode ? '#121212' : '#ffffff';
+        }
+        
+        themeColorMeta.setAttribute('content', backgroundColor);
+        console.log(`Theme color updated to: ${backgroundColor}`);
     }
 
     saveTheme(theme) {
