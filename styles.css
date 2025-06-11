@@ -181,7 +181,7 @@ body {
     background: var(--surface-overlay);
     backdrop-filter: blur(32px) saturate(180%);
     -webkit-backdrop-filter: blur(32px) saturate(180%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: var(--space-6) var(--space-6) var(--space-4);
     padding-top: max(var(--space-6), env(safe-area-inset-top, 24px));
     position: sticky;
@@ -536,7 +536,7 @@ body {
     background: var(--surface-overlay);
     backdrop-filter: blur(32px) saturate(180%);
     -webkit-backdrop-filter: blur(32px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
     padding: var(--space-4) var(--space-6);
     padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 16px));
     display: flex;
@@ -909,7 +909,8 @@ body {
 
 [data-theme="dark"] .header {
     background: var(--surface-overlay);
-    border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .header-btn {
@@ -939,7 +940,8 @@ body {
 
 [data-theme="dark"] .bottom-nav {
     background: var(--surface-overlay);
-    border-top: 1px solid rgba(68, 68, 68, 0.3);
+    border-top: 1px solid rgba(68, 68, 68, 0.4);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] .nav-item {
@@ -964,6 +966,30 @@ body {
 
 [data-theme="dark"] .main-content {
     background: var(--bg-primary);
+}
+
+/* Additional dark mode element fixes */
+[data-theme="dark"] .card-badge {
+    background: var(--surface-raised);
+    color: var(--text-secondary);
+    border: 1px solid rgba(224, 224, 224, 0.1);
+}
+
+[data-theme="dark"] .card-icon::before {
+    background: var(--accent-gradient);
+}
+
+[data-theme="dark"] .profile-avatar {
+    background: var(--surface-raised);
+    border: 2px solid rgba(224, 224, 224, 0.2);
+}
+
+[data-theme="dark"] .stats-number {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .stats-label {
+    color: var(--text-secondary);
 }
 
 /* Auto theme adjustments */
@@ -1039,6 +1065,42 @@ body {
     
     :root:not([data-theme]) .main-content {
         background: var(--bg-primary);
+    }
+    
+    /* Additional auto dark mode element fixes */
+    :root:not([data-theme]) .bottom-nav {
+        background: var(--surface-overlay);
+        border-top: 1px solid rgba(68, 68, 68, 0.4);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+    }
+    
+    :root:not([data-theme]) .header {
+        background: var(--surface-overlay);
+        border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    :root:not([data-theme]) .card-badge {
+        background: var(--surface-raised);
+        color: var(--text-secondary);
+        border: 1px solid rgba(224, 224, 224, 0.1);
+    }
+    
+    :root:not([data-theme]) .card-icon::before {
+        background: var(--accent-gradient);
+    }
+    
+    :root:not([data-theme]) .profile-avatar {
+        background: var(--surface-raised);
+        border: 2px solid rgba(224, 224, 224, 0.2);
+    }
+    
+    :root:not([data-theme]) .stats-number {
+        color: var(--text-primary);
+    }
+    
+    :root:not([data-theme]) .stats-label {
+        color: var(--text-secondary);
     }
 }
 
