@@ -1064,8 +1064,8 @@ body {
 
 .update-card.success {
     pointer-events: none;
-    background: linear-gradient(135deg, rgba(0, 206, 201, 0.1) 0%, rgba(0, 206, 201, 0.2) 100%);
-    border-color: rgba(0, 206, 201, 0.3);
+    background: var(--surface-raised);
+    border-color: rgba(102, 126, 234, 0.2);
 }
 
 .update-card.error {
@@ -1137,7 +1137,8 @@ body {
 }
 
 [data-theme="dark"] .update-card.success {
-    background: linear-gradient(135deg, rgba(0, 206, 201, 0.2) 0%, rgba(0, 206, 201, 0.3) 100%);
+    background: var(--surface-raised);
+    border-color: rgba(102, 126, 234, 0.3);
 }
 
 [data-theme="dark"] .update-card.error {
@@ -1155,7 +1156,8 @@ body {
     }
     
     :root:not([data-theme]) .update-card.success {
-        background: linear-gradient(135deg, rgba(0, 206, 201, 0.2) 0%, rgba(0, 206, 201, 0.3) 100%);
+        background: var(--surface-raised);
+        border-color: rgba(102, 126, 234, 0.3);
     }
     
     :root:not([data-theme]) .update-card.error {
