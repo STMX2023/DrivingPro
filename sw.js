@@ -326,7 +326,57 @@ self.addEventListener('message', (event) => {
             event.waitUntil(cleanupOldCaches());
             break;
             
+        case 'FORCE_UPDATE':
+            event.waitUntil(handleForceUpdate());
+            break;
+            
+        case 'CLEAR_ALL_CACHES':
+            event.waitUntil(clearAllCaches());
+            break;
+            
         default:
             console.log('Service Worker: Unknown message type', type);
     }
-}); 
+});
+
+// Handle force update request
+async function handleForceUpdate() {
+    try {
+        console.log('Service Worker: Handling force update...');
+        
+        // Clear all caches
+        await clearAllCaches();
+        
+        // Skip waiting to activate immediately
+        await self.skipWaiting();
+        
+        // Claim all clients
+        await self.clients.claim();
+        
+        console.log('Service Worker: Force update complete');
+    } catch (error) {
+        console.error('Service Worker: Force update failed', error);
+    }
+}
+
+// Clear all caches completely
+async function clearAllCaches() {
+    try {
+        console.log('Service Worker: Clearing all caches...');
+        
+        const cacheNames = await caches.keys();
+        console.log('Service Worker: Found caches to delete:', cacheNames);
+        
+        await Promise.all(
+            cacheNames.map(cacheName => {
+                console.log('Service Worker: Deleting cache:', cacheName);
+                return caches.delete(cacheName);
+            })
+        );
+        
+        console.log('Service Worker: All caches cleared successfully');
+    } catch (error) {
+        console.error('Service Worker: Failed to clear caches', error);
+        throw error;
+    }
+} 

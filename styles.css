@@ -188,6 +188,7 @@ body {
     top: 0;
     z-index: 100;
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
     justify-content: space-between;
 }
@@ -1047,6 +1048,122 @@ body {
     
     :root:not([data-theme]) .stats-label {
         color: var(--text-secondary);
+    }
+}
+
+/* === UPDATE CARD STYLES === */
+.update-card {
+    position: relative;
+    cursor: pointer;
+}
+
+.update-card.loading {
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.update-card.success {
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(0, 206, 201, 0.1) 0%, rgba(0, 206, 201, 0.2) 100%);
+    border-color: rgba(0, 206, 201, 0.3);
+}
+
+.update-card.error {
+    background: linear-gradient(135deg, rgba(225, 112, 85, 0.1) 0%, rgba(225, 112, 85, 0.2) 100%);
+    border-color: rgba(225, 112, 85, 0.3);
+}
+
+.update-badge {
+    background: var(--primary-gradient);
+    color: white;
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    box-shadow: var(--shadow-md), var(--glow-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s var(--ease-out-cubic);
+}
+
+.update-badge.loading {
+    background: var(--primary-gradient);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.update-badge.success {
+    background: var(--success-gradient);
+    box-shadow: var(--shadow-md), var(--glow-success);
+}
+
+.update-badge.error {
+    background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(225, 112, 85, 0.4);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.update-card .card-icon svg {
+    transition: transform 0.3s ease;
+}
+
+.update-card.loading .card-icon svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark theme adjustments for update card */
+[data-theme="dark"] .update-card.loading {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+}
+
+[data-theme="dark"] .update-card.success {
+    background: linear-gradient(135deg, rgba(0, 206, 201, 0.2) 0%, rgba(0, 206, 201, 0.3) 100%);
+}
+
+[data-theme="dark"] .update-card.error {
+    background: linear-gradient(135deg, rgba(225, 112, 85, 0.2) 0%, rgba(225, 112, 85, 0.3) 100%);
+}
+
+[data-theme="dark"] .update-badge {
+    border: 1px solid rgba(224, 224, 224, 0.1);
+}
+
+/* Auto theme adjustments */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) .update-card.loading {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    }
+    
+    :root:not([data-theme]) .update-card.success {
+        background: linear-gradient(135deg, rgba(0, 206, 201, 0.2) 0%, rgba(0, 206, 201, 0.3) 100%);
+    }
+    
+    :root:not([data-theme]) .update-card.error {
+        background: linear-gradient(135deg, rgba(225, 112, 85, 0.2) 0%, rgba(225, 112, 85, 0.3) 100%);
+    }
+    
+    :root:not([data-theme]) .update-badge {
+        border: 1px solid rgba(224, 224, 224, 0.1);
     }
 }
 

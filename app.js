@@ -582,6 +582,15 @@ class DrivingProApp {
             });
         });
 
+        // Update App Card - Special handler
+        const updateCard = document.getElementById('updateAppCard');
+        if (updateCard) {
+            updateCard.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent default card click
+                this.handleAppUpdate();
+            });
+        }
+
         // Header button
         const headerBtn = document.querySelector('.header-btn');
         if (headerBtn) {
@@ -801,6 +810,166 @@ class DrivingProApp {
             setTimeout(() => {
                 this.installBanner.remove();
             }, 300);
+        }
+    }
+
+    // ===== APP UPDATE SYSTEM =====
+    async handleAppUpdate() {
+        const updateCard = document.getElementById('updateAppCard');
+        const updateBadge = document.querySelector('.update-badge');
+        const cardTitle = updateCard.querySelector('.card-title');
+        const cardDescription = updateCard.querySelector('.card-description');
+        const cardIcon = updateCard.querySelector('.card-icon svg');
+        
+        try {
+            // Update UI to show loading state
+            this.setUpdateCardState('loading', cardTitle, cardDescription, updateBadge, cardIcon);
+            
+            // Step 1: Clear all caches
+            await this.clearAllCaches();
+            
+            // Step 2: Unregister and re-register service worker
+            await this.refreshServiceWorker();
+            
+            // Step 3: Show success state
+            this.setUpdateCardState('success', cardTitle, cardDescription, updateBadge, cardIcon);
+            
+            // Step 4: Force refresh after delay
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 2000);
+            
+        } catch (error) {
+            console.error('App update failed:', error);
+            this.setUpdateCardState('error', cardTitle, cardDescription, updateBadge, cardIcon);
+            
+            // Reset to normal state after delay
+            setTimeout(() => {
+                this.setUpdateCardState('normal', cardTitle, cardDescription, updateBadge, cardIcon);
+            }, 3000);
+        }
+    }
+
+    async clearAllCaches() {
+        console.log('Clearing all caches...');
+        
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            console.log('Found caches:', cacheNames);
+            
+            await Promise.all(
+                cacheNames.map(cacheName => {
+                    console.log('Deleting cache:', cacheName);
+                    return caches.delete(cacheName);
+                })
+            );
+            
+            console.log('All caches cleared');
+        }
+        
+        // Also clear localStorage if needed
+        try {
+            // Preserve theme setting
+            const savedTheme = localStorage.getItem('drivingpro-theme');
+            localStorage.clear();
+            if (savedTheme) {
+                localStorage.setItem('drivingpro-theme', savedTheme);
+            }
+        } catch (error) {
+            console.warn('Could not clear localStorage:', error);
+        }
+    }
+
+    async refreshServiceWorker() {
+        console.log('Refreshing service worker...');
+        
+        if ('serviceWorker' in navigator) {
+            try {
+                // Get current registration
+                const registration = await navigator.serviceWorker.getRegistration();
+                
+                if (registration) {
+                    // Unregister current service worker
+                    await registration.unregister();
+                    console.log('Service worker unregistered');
+                }
+                
+                // Wait a bit for cleanup
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Re-register service worker
+                const newRegistration = await navigator.serviceWorker.register('./sw.js?v=' + Date.now(), {
+                    scope: './'
+                });
+                
+                console.log('Service worker re-registered:', newRegistration);
+                
+                // Wait for the new service worker to install and activate
+                if (newRegistration.installing) {
+                    await new Promise(resolve => {
+                        newRegistration.installing.addEventListener('statechange', (e) => {
+                            if (e.target.state === 'activated') {
+                                resolve();
+                            }
+                        });
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Service worker refresh failed:', error);
+                throw error;
+            }
+        }
+    }
+
+    setUpdateCardState(state, titleEl, descEl, badgeEl, iconEl) {
+        const states = {
+            normal: {
+                title: 'Update App',
+                description: 'Clear cache and refresh to get the latest features and fixes',
+                badge: 'v1.6.3',
+                badgeClass: 'update-badge',
+                iconRotation: '0deg',
+                cardClass: 'update-card'
+            },
+            loading: {
+                title: 'Updating...',
+                description: 'Clearing cache and downloading latest version',
+                badge: 'Updating',
+                badgeClass: 'update-badge loading',
+                iconRotation: '360deg',
+                cardClass: 'update-card loading'
+            },
+            success: {
+                title: 'Update Complete!',
+                description: 'App will reload in a moment with the latest version',
+                badge: 'Success',
+                badgeClass: 'update-badge success',
+                iconRotation: '0deg',
+                cardClass: 'update-card success'
+            },
+            error: {
+                title: 'Update Failed',
+                description: 'Something went wrong. Please try again or refresh manually',
+                badge: 'Error',
+                badgeClass: 'update-badge error',
+                iconRotation: '0deg',
+                cardClass: 'update-card error'
+            }
+        };
+        
+        const config = states[state];
+        if (config) {
+            titleEl.textContent = config.title;
+            descEl.textContent = config.description;
+            badgeEl.textContent = config.badge;
+            badgeEl.className = config.badgeClass;
+            iconEl.style.transform = `rotate(${config.iconRotation})`;
+            iconEl.style.transition = state === 'loading' ? 'transform 1s linear infinite' : 'transform 0.3s ease';
+            
+            // Update card class
+            const updateCard = document.getElementById('updateAppCard');
+            updateCard.className = config.cardClass;
         }
     }
 
