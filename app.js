@@ -10,13 +10,19 @@ class DrivingProApp {
         this.init();
     }
 
-    init() {
+    async init() {
         this.initializeThemeSystem();
-        this.initializeTimeSystem();
+        await this.initializeTimeSystem();
         this.initializeLocationSystem();
         this.setupEventListeners();
         this.setupPWA();
         this.animateCards();
+        
+        // Refresh auto theme after time data is loaded
+        if (this.currentTheme === 'auto') {
+            this.applyTheme('auto');
+            this.updateThemeColor('auto');
+        }
     }
 
     // ===== TIME SYSTEM =====
@@ -135,11 +141,13 @@ class DrivingProApp {
             this.getUserLocationTime().then(() => {
                 this.updateDynamicContent();
                 this.updateTimeBasedCards();
+                this.updateAutoThemeBasedOnTime();
             });
         }, 60000); // 60 seconds
 
         // Initial update
         this.updateTimeBasedCards();
+        this.updateAutoThemeBasedOnTime();
     }
 
     updateDynamicContent() {
@@ -483,11 +491,12 @@ class DrivingProApp {
             });
         });
 
-        // Listen for system theme changes when in auto mode
+        // Listen for system theme changes when in auto mode (as fallback)
         if (window.matchMedia) {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             mediaQuery.addEventListener('change', () => {
-                if (this.currentTheme === 'auto') {
+                // Only use system preference if time data isn't available
+                if (this.currentTheme === 'auto' && (!this.timeData || this.timeData.hour === undefined)) {
                     this.applyTheme('auto');
                     this.updateThemeColor('auto');
                 }
@@ -524,8 +533,12 @@ class DrivingProApp {
                 documentElement.setAttribute('data-theme', 'dark');
                 break;
             case 'auto':
-                // Let CSS media queries handle auto theme
-                // The CSS will automatically apply dark theme if system prefers dark
+                // Use app's time-of-day detection for auto theme
+                const shouldUseDarkTheme = this.shouldUseDarkThemeBasedOnTime();
+                if (shouldUseDarkTheme) {
+                    documentElement.setAttribute('data-theme', 'dark');
+                }
+                console.log(`Auto theme: ${shouldUseDarkTheme ? 'dark' : 'light'} (time: ${this.timeData?.timeOfDay || 'unknown'})`);
                 break;
         }
     }
@@ -541,13 +554,48 @@ class DrivingProApp {
         } else if (theme === 'light') {
             backgroundColor = '#ffffff'; // Light mode background
         } else if (theme === 'auto') {
-            // Check system preference
-            const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            backgroundColor = isDarkMode ? '#121212' : '#ffffff';
+            // Use app's time-of-day detection instead of system preference
+            const shouldUseDarkTheme = this.shouldUseDarkThemeBasedOnTime();
+            backgroundColor = shouldUseDarkTheme ? '#121212' : '#ffffff';
         }
         
         themeColorMeta.setAttribute('content', backgroundColor);
         console.log(`Theme color updated to: ${backgroundColor}`);
+    }
+
+    shouldUseDarkThemeBasedOnTime() {
+        // If time data isn't available yet, fall back to system preference
+        if (!this.timeData || this.timeData.hour === undefined) {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        
+        // Use app's time-of-day logic
+        // Dark theme during evening (17:00-21:00) and night (21:00-6:00)
+        // Light theme during morning (6:00-12:00) and afternoon (12:00-17:00)
+        const hour = this.timeData.hour;
+        const timeOfDay = this.timeData.timeOfDay;
+        
+        // Dark theme for evening and night
+        if (timeOfDay === 'evening' || timeOfDay === 'night') {
+            return true;
+        }
+        
+        // Light theme for morning and afternoon
+        if (timeOfDay === 'morning' || timeOfDay === 'afternoon') {
+            return false;
+        }
+        
+        // Fallback based on hour if timeOfDay is not available
+        // Dark theme: 17:00 (5 PM) to 6:59 AM
+        return hour >= 17 || hour < 7;
+    }
+
+    updateAutoThemeBasedOnTime() {
+        // Only update if currently in auto mode
+        if (this.currentTheme === 'auto') {
+            this.applyTheme('auto');
+            this.updateThemeColor('auto');
+        }
     }
 
     saveTheme(theme) {
@@ -576,7 +624,7 @@ class DrivingProApp {
         if (this.currentTheme === 'dark') {
             return true;
         } else if (this.currentTheme === 'auto') {
-            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            return this.shouldUseDarkThemeBasedOnTime();
         }
         return false;
     }
