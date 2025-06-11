@@ -468,8 +468,8 @@ class DrivingProApp {
     }
 
     loadSavedTheme() {
-        // Get saved theme from localStorage or default to 'light'
-        const savedTheme = localStorage.getItem('drivingpro-theme') || 'light';
+        // Get saved theme from localStorage or default to 'dark'
+        const savedTheme = localStorage.getItem('drivingpro-theme') || 'dark';
         this.currentTheme = savedTheme;
         this.applyTheme(savedTheme);
     }
