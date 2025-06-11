@@ -6,10 +6,12 @@ class DrivingProApp {
         this.timeBasedCards = new Map();
         this.locationData = {};
         this.locationWatchId = null;
+        this.currentTheme = 'light';
         this.init();
     }
 
     init() {
+        this.initializeThemeSystem();
         this.initializeTimeSystem();
         this.initializeLocationSystem();
         this.setupEventListeners();
@@ -458,6 +460,111 @@ class DrivingProApp {
         }
     }
 
+    // ===== THEME SYSTEM =====
+    initializeThemeSystem() {
+        this.loadSavedTheme();
+        this.setupThemeListeners();
+        this.updateThemeButtons();
+    }
+
+    loadSavedTheme() {
+        // Get saved theme from localStorage or default to 'light'
+        const savedTheme = localStorage.getItem('drivingpro-theme') || 'light';
+        this.currentTheme = savedTheme;
+        this.applyTheme(savedTheme);
+    }
+
+    setupThemeListeners() {
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        themeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const theme = button.dataset.theme;
+                this.setTheme(theme);
+            });
+        });
+
+        // Listen for system theme changes when in auto mode
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', () => {
+                if (this.currentTheme === 'auto') {
+                    this.applyTheme('auto');
+                }
+            });
+        }
+    }
+
+    setTheme(theme) {
+        this.currentTheme = theme;
+        this.applyTheme(theme);
+        this.saveTheme(theme);
+        this.updateThemeButtons();
+        
+        // Haptic feedback
+        this.hapticFeedback('light');
+        
+        console.log(`Theme changed to: ${theme}`);
+    }
+
+    applyTheme(theme) {
+        const documentElement = document.documentElement;
+        
+        // Remove existing theme attributes
+        documentElement.removeAttribute('data-theme');
+        
+        switch (theme) {
+            case 'light':
+                // Light theme is default, no attribute needed
+                break;
+            case 'dark':
+                documentElement.setAttribute('data-theme', 'dark');
+                break;
+            case 'auto':
+                // Let CSS media queries handle auto theme
+                // The CSS will automatically apply dark theme if system prefers dark
+                break;
+        }
+    }
+
+    saveTheme(theme) {
+        localStorage.setItem('drivingpro-theme', theme);
+    }
+
+    updateThemeButtons() {
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        themeButtons.forEach(button => {
+            const buttonTheme = button.dataset.theme;
+            if (buttonTheme === this.currentTheme) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    }
+
+    // Public method to get current theme
+    getCurrentTheme() {
+        return this.currentTheme;
+    }
+
+    // Public method to check if dark mode is active
+    isDarkMode() {
+        if (this.currentTheme === 'dark') {
+            return true;
+        } else if (this.currentTheme === 'auto') {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        return false;
+    }
+
+    // Public method to get effective theme (resolves 'auto' to 'light' or 'dark')
+    getEffectiveTheme() {
+        if (this.currentTheme === 'auto') {
+            return this.isDarkMode() ? 'dark' : 'light';
+        }
+        return this.currentTheme;
+    }
+
     setupEventListeners() {
         // Tab navigation
         const navItems = document.querySelectorAll('.nav-item');
@@ -591,7 +698,7 @@ class DrivingProApp {
     setupPWA() {
         // Register service worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=1.3.0')
+            navigator.serviceWorker.register('./sw.js?v=1.4.0')
                 .then(registration => {
                     console.log('SW registered successfully');
                     // Force update if there's a waiting service worker
