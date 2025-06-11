@@ -5,7 +5,7 @@
     "start_url": "/DrivingPro/",
     "display": "standalone",
     "background_color": "#F2F2F7",
-    "theme_color": "#007AFF",
+    "theme_color": "transparent",
     "orientation": "portrait-primary",
     "categories": ["education", "lifestyle", "utilities"],
     "lang": "en-US",
