@@ -189,16 +189,10 @@ body {
     z-index: 100;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    width: 100%;
-    margin-left: var(--space-2);
-}
+/* Removed header-left - using direct layout now */
 
 .app-icon {
     display: flex;
@@ -226,7 +220,6 @@ body {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    flex: 1;
     justify-content: flex-start;
 }
 
