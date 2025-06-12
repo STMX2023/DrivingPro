@@ -681,7 +681,7 @@ class DrivingProApp {
     }
 
     startWeatherUpdates() {
-        // Update weather every 30 minutes
+        // Update weather every 8 hours
         setInterval(async () => {
             try {
                 await this.loadWeatherData();
@@ -689,9 +689,9 @@ class DrivingProApp {
             } catch (error) {
                 console.error('Automatic weather refresh failed:', error);
             }
-        }, 30 * 60 * 1000); // 30 minutes
+        }, 8 * 60 * 60 * 1000); // 8 hours
         
-        console.log('Weather update interval started (30 min intervals)');
+        console.log('Weather update interval started (8 hour intervals)');
     }
 
     // Public method to manually refresh weather
