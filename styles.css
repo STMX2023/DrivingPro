@@ -228,7 +228,7 @@ body {
 .weather-timeline {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
     padding: var(--space-2);
     background: var(--surface-raised);
     border-radius: var(--radius-xl);
@@ -245,16 +245,14 @@ body {
     border-radius: var(--radius-xl);
     position: relative;
     transition: all 0.3s var(--ease-out-cubic);
-    padding: var(--space-2);
-    gap: var(--space-1);
+    padding: var(--space-1);
+    gap: 2px;
 }
 
 /* Current Day (Larger Container) */
 .weather-day.current-day {
     width: 60px;
     height: 70px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .weather-day.current-day .weather-icon-container {
@@ -278,8 +276,6 @@ body {
 .weather-day.forecast-day {
     width: 42px;
     height: 52px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .weather-day.forecast-day .weather-icon-container {
@@ -326,16 +322,6 @@ body {
 /* Hover Effects */
 .weather-day:hover {
     transform: scale(1.05);
-}
-
-.weather-day.current-day:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.weather-day.forecast-day:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Loading States */
@@ -1020,25 +1006,7 @@ body {
     border: 1px solid rgba(224, 224, 224, 0.2);
 }
 
-[data-theme="dark"] .weather-day.current-day {
-    background: rgba(224, 224, 224, 0.15);
-    border-color: rgba(224, 224, 224, 0.25);
-}
 
-[data-theme="dark"] .weather-day.forecast-day {
-    background: rgba(224, 224, 224, 0.1);
-    border-color: rgba(224, 224, 224, 0.15);
-}
-
-[data-theme="dark"] .weather-day.current-day:hover {
-    background: rgba(224, 224, 224, 0.2);
-    border-color: rgba(224, 224, 224, 0.3);
-}
-
-[data-theme="dark"] .weather-day.forecast-day:hover {
-    background: rgba(224, 224, 224, 0.15);
-    border-color: rgba(224, 224, 224, 0.2);
-}
 
 [data-theme="dark"] .weather-loading {
     border: 2px solid var(--color-neutral-600);
@@ -1143,25 +1111,7 @@ body {
         border: 1px solid rgba(224, 224, 224, 0.2);
     }
 
-    :root:not([data-theme]) .weather-day.current-day {
-        background: rgba(224, 224, 224, 0.15);
-        border-color: rgba(224, 224, 224, 0.25);
-    }
 
-    :root:not([data-theme]) .weather-day.forecast-day {
-        background: rgba(224, 224, 224, 0.1);
-        border-color: rgba(224, 224, 224, 0.15);
-    }
-
-    :root:not([data-theme]) .weather-day.current-day:hover {
-        background: rgba(224, 224, 224, 0.2);
-        border-color: rgba(224, 224, 224, 0.3);
-    }
-
-    :root:not([data-theme]) .weather-day.forecast-day:hover {
-        background: rgba(224, 224, 224, 0.15);
-        border-color: rgba(224, 224, 224, 0.2);
-    }
 
     :root:not([data-theme]) .weather-loading {
         border: 2px solid var(--color-neutral-600);
