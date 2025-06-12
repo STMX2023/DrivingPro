@@ -614,7 +614,8 @@ class DrivingProApp {
         console.log('Updating current weather icon with data:', this.weatherData.current);
         
         const { condition, description, temp } = this.weatherData.current;
-        const iconUrl = `./icons/weather/${condition}.svg`;
+        const mappedCondition = this.mapWeatherCondition(condition);
+        const iconUrl = `./icons/weather/${mappedCondition}.svg`;
         
         currentWeatherEl.innerHTML = `
             <div class="weather-icon-container">
@@ -636,22 +637,108 @@ class DrivingProApp {
         console.log('Updating forecast icons with data:', this.weatherData.forecast);
         
         const forecastHtml = this.weatherData.forecast.map((day, index) => {
-            const condition = day.condition || day.condition_slug || 'clear_day';
+            // Ensure accurate icon mapping
+            const condition = this.mapWeatherCondition(day.condition || day.condition_slug || 'clear_day');
             const iconUrl = `./icons/weather/${condition}.svg`;
-            const temp = day.max || day.temp || Math.floor(Math.random() * 10) + 20; // Use max temp for forecast
+            
+            // Get both max and min temperatures
+            const maxTemp = day.max || day.temp || Math.floor(Math.random() * 10) + 20;
+            const minTemp = day.min || Math.floor(Math.random() * 8) + 10;
             
             return `
-                <div class="weather-day forecast-day" title="${day.description || 'Previsão'} - ${temp}°">
+                <div class="weather-day forecast-day" title="${day.description || 'Previsão'} - ${maxTemp}°/${minTemp}°">
                     <div class="weather-icon-container">
                         <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
                     </div>
-                    <div class="weather-temp">${temp}°</div>
+                    <div class="weather-temps">
+                        <div class="weather-temp max-temp">${maxTemp}°</div>
+                        <div class="weather-temp min-temp">${minTemp}°</div>
+                    </div>
                 </div>
             `;
         }).join('');
         
         forecastEl.innerHTML = forecastHtml;
         console.log('Forecast icons updated successfully');
+    }
+
+    mapWeatherCondition(condition) {
+        // Map API condition codes to available icon names
+        const conditionMap = {
+            // Clear conditions
+            'clear_day': 'clear_day',
+            'clear_night': 'clear_night',
+            'clear': 'clear_day',
+            'sunny': 'clear_day',
+            
+            // Cloudy conditions
+            'cloud': 'cloud',
+            'clouds': 'cloud',
+            'cloudly_day': 'cloudly_day',
+            'cloudly_night': 'cloudly_night',
+            'partly_cloudy': 'cloudly_day',
+            'cloudy': 'cloud',
+            
+            // Rain conditions
+            'rain': 'rain',
+            'raining': 'rain',
+            'drizzle': 'drizzle',
+            'light_rain': 'drizzle',
+            'heavy_rain': 'rain',
+            
+            // Storm conditions
+            'storm': 'storm',
+            'thunderstorm': 'storm',
+            'lightning': 'storm',
+            
+            // Other conditions
+            'snow': 'snow',
+            'snowing': 'snow',
+            'fog': 'fog',
+            'foggy': 'fog',
+            'mist': 'mist',
+            'misty': 'mist',
+            'hail': 'hail',
+            'wind': 'wind',
+            'windy': 'wind',
+            
+            // None conditions
+            'none_day': 'none_day',
+            'none_night': 'none_night',
+            'none': 'none_day'
+        };
+        
+        // Check if condition exists in our mapping
+        const mappedCondition = conditionMap[condition.toLowerCase()];
+        if (mappedCondition) {
+            console.log(`Mapped condition '${condition}' to '${mappedCondition}'`);
+            return mappedCondition;
+        }
+        
+        // If not found, try to intelligently guess based on keywords
+        const lowerCondition = condition.toLowerCase();
+        
+        if (lowerCondition.includes('rain') || lowerCondition.includes('chuva')) {
+            return lowerCondition.includes('light') || lowerCondition.includes('leve') ? 'drizzle' : 'rain';
+        }
+        if (lowerCondition.includes('storm') || lowerCondition.includes('tempestade')) {
+            return 'storm';
+        }
+        if (lowerCondition.includes('cloud') || lowerCondition.includes('nuvem')) {
+            return 'cloud';
+        }
+        if (lowerCondition.includes('clear') || lowerCondition.includes('limpo') || lowerCondition.includes('sol')) {
+            return 'clear_day';
+        }
+        if (lowerCondition.includes('snow') || lowerCondition.includes('neve')) {
+            return 'snow';
+        }
+        if (lowerCondition.includes('fog') || lowerCondition.includes('neblina')) {
+            return 'fog';
+        }
+        
+        console.warn(`Unknown weather condition '${condition}', falling back to clear_day`);
+        return 'clear_day'; // Default fallback
     }
 
     getDayInitial(weekday) {
