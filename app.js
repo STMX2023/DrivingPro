@@ -619,16 +619,17 @@ class DrivingProApp {
         const iconUrl = this.getWeatherIconUrl(condition);
         const fallbackIconUrl = 'https://assets.hgbrasil.com/weather/icons/conditions/clear_day.svg';
         
-        // Use max/min if available, otherwise show current temp
-        const hasMinMax = max !== undefined && min !== undefined;
+        // Always show both max and min, fallback to temp if missing
+        const maxToShow = (max !== undefined && max !== null) ? max : temp;
+        const minToShow = (min !== undefined && min !== null) ? min : temp;
         
         currentWeatherEl.innerHTML = `
             <div class="weather-icon-container">
                 <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
             </div>
             <div class="weather-temps">
-                <div class="weather-temp max-temp">${hasMinMax ? max : temp}°</div>
-                ${hasMinMax ? `<div class="weather-temp min-temp">${min}°</div>` : ''}
+                <div class="weather-temp max-temp">${maxToShow}°</div>
+                <div class="weather-temp min-temp">${minToShow}°</div>
             </div>
         `;
         

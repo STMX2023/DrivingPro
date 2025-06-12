@@ -228,8 +228,12 @@ body {
 .weather-timeline {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 0.5vw;
     padding: var(--space-1);
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: auto;
+    justify-content: flex-start;
 }
 
 /* Weather Day Container */
@@ -241,24 +245,28 @@ body {
     border-radius: var(--radius-xl);
     position: relative;
     transition: all 0.3s var(--ease-out-cubic);
-    padding: var(--space-1);
+    padding: 4px 2px;
     gap: 2px;
+    min-width: 48px;
+    min-height: 60px;
 }
 
 /* Current Day (Larger Container) */
 .weather-day.current-day {
-    width: 60px;
-    height: 70px;
+    width: 76px;
+    height: 88px;
+    min-width: 76px;
+    min-height: 88px;
 }
 
 .weather-day.current-day .weather-icon-container {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
 }
 
 .weather-day.current-day .weather-icon {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
 }
 
 /* Forecast Days Container */
@@ -270,18 +278,20 @@ body {
 
 /* Forecast Day (Smaller Containers) */
 .weather-day.forecast-day {
-    width: 42px;
-    height: 52px;
+    width: 54px;
+    height: 68px;
+    min-width: 54px;
+    min-height: 68px;
 }
 
 .weather-day.forecast-day .weather-icon-container {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
 }
 
 .weather-day.forecast-day .weather-icon {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
 }
 
 /* Weather Icon Container */
@@ -301,7 +311,7 @@ body {
 
 /* Weather Temperature Text */
 .weather-temp {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
     text-align: center;
@@ -311,7 +321,7 @@ body {
 }
 
 .weather-day.current-day .weather-temp {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -324,7 +334,7 @@ body {
 }
 
 .weather-temps .weather-temp {
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1;
 }
 
@@ -380,29 +390,77 @@ body {
 }
 
 /* Responsive Adjustments */
-@media (max-width: 375px) {
-    .weather-forecast-box {
-        width: 180px;
+@media (max-width: 600px) {
+    .weather-timeline {
+        gap: 1vw;
     }
-    
-    .current-weather-box {
+    .weather-day.current-day {
         width: 64px;
-        height: 52px;
+        height: 74px;
+        min-width: 64px;
+        min-height: 74px;
     }
-    
-    .weather-icon-container {
+    .weather-day.current-day .weather-icon-container,
+    .weather-day.current-day .weather-icon {
+        width: 36px;
+        height: 36px;
+    }
+    .weather-day.forecast-day {
+        width: 42px;
+        height: 54px;
+        min-width: 42px;
+        min-height: 54px;
+    }
+    .weather-day.forecast-day .weather-icon-container,
+    .weather-day.forecast-day .weather-icon {
         width: 24px;
         height: 24px;
     }
-    
-    .current-weather-icon {
-        width: 24px;
-        height: 24px;
+    .weather-temp {
+        font-size: 10px;
     }
-    
-    .forecast-icon {
+    .weather-day.current-day .weather-temp {
+        font-size: 12px;
+    }
+    .weather-temps .weather-temp {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 375px) {
+    .weather-timeline {
+        gap: 0.5vw;
+    }
+    .weather-day.current-day {
+        width: 54px;
+        height: 62px;
+        min-width: 54px;
+        min-height: 62px;
+    }
+    .weather-day.current-day .weather-icon-container,
+    .weather-day.current-day .weather-icon {
+        width: 28px;
+        height: 28px;
+    }
+    .weather-day.forecast-day {
+        width: 32px;
+        height: 40px;
+        min-width: 32px;
+        min-height: 40px;
+    }
+    .weather-day.forecast-day .weather-icon-container,
+    .weather-day.forecast-day .weather-icon {
         width: 16px;
         height: 16px;
+    }
+    .weather-temp {
+        font-size: 8px;
+    }
+    .weather-day.current-day .weather-temp {
+        font-size: 10px;
+    }
+    .weather-temps .weather-temp {
+        font-size: 7px;
     }
 }
 
