@@ -1,4 +1,12 @@
-// PWA App JavaScript
+// DrivingPro PWA Application
+// Enhanced iOS-style interface with dynamic theming
+//
+// Weather Feature Setup:
+// 1. Get your free API key from: https://console.hgbrasil.com/
+// 2. Replace 'null' in weatherApiKey with your key
+// 3. Uncomment the loadWeatherData() call in initializeWeatherSystem()
+// 
+// Current status: Running in demo mode with sample weather data
 class DrivingProApp {
     constructor() {
         this.currentTab = 'home';
@@ -8,7 +16,7 @@ class DrivingProApp {
         this.locationWatchId = null;
         this.currentTheme = 'light';
         this.weatherData = {};
-        this.weatherApiKey = 'YOUR_HG_WEATHER_API_KEY'; // Replace with your actual API key
+        this.weatherApiKey = null; // Will work without key for demo, add your key for full features
         this.init();
     }
 
@@ -497,7 +505,19 @@ class DrivingProApp {
     async initializeWeatherSystem() {
         console.log('Initializing weather system...');
         this.setupWeatherDisplay();
-        await this.loadWeatherData();
+        
+        // For now, always use demo data until user provides API key
+        console.log('Using demo weather data (no API key provided)');
+        this.loadDemoWeatherData();
+        
+        // Uncomment below when user provides API key
+        // try {
+        //     await this.loadWeatherData();
+        // } catch (error) {
+        //     console.error('Weather system initialization failed, using demo data:', error);
+        //     this.loadDemoWeatherData();
+        // }
+        
         this.startWeatherUpdates();
     }
 
@@ -514,13 +534,21 @@ class DrivingProApp {
             if (this.locationData && this.locationData.latitude && this.locationData.longitude) {
                 // Use geolocation data
                 console.log('Using geolocation for weather data...');
-                const fields = 'only_results,temp,city_name,forecast,max,min,date,weekday,condition_slug,description';
-                url = `https://api.hgbrasil.com/weather?format=json-cors&key=${this.weatherApiKey}&fields=${fields}&lat=${this.locationData.latitude}&lon=${this.locationData.longitude}`;
+                if (this.weatherApiKey) {
+                    const fields = 'only_results,temp,city_name,forecast,max,min,date,weekday,condition_slug,description';
+                    url = `https://api.hgbrasil.com/weather?format=json-cors&key=${this.weatherApiKey}&fields=${fields}&lat=${this.locationData.latitude}&lon=${this.locationData.longitude}`;
+                } else {
+                    url = `https://api.hgbrasil.com/weather?format=json-cors&lat=${this.locationData.latitude}&lon=${this.locationData.longitude}`;
+                }
             } else {
                 // Fallback to IP-based location
                 console.log('Using IP-based location for weather data...');
-                const fields = 'only_results,temp,city_name,forecast,max,min,date,weekday,condition_slug,description';
-                url = `https://api.hgbrasil.com/weather?format=json-cors&key=${this.weatherApiKey}&fields=${fields}&user_ip=remote`;
+                if (this.weatherApiKey) {
+                    const fields = 'only_results,temp,city_name,forecast,max,min,date,weekday,condition_slug,description';
+                    url = `https://api.hgbrasil.com/weather?format=json-cors&key=${this.weatherApiKey}&fields=${fields}&user_ip=remote`;
+                } else {
+                    url = `https://api.hgbrasil.com/weather?format=json-cors&user_ip=remote`;
+                }
             }
             
             console.log('Fetching weather data from:', url);
@@ -533,13 +561,20 @@ class DrivingProApp {
             const data = await response.json();
             console.log('Weather data received:', data);
             
+            // According to HG Weather API documentation, data is inside 'results' object
+            const results = data.results || data;
+            
+            if (!results) {
+                throw new Error('No weather data in API response');
+            }
+            
             // Process current weather and forecast for 7 days total (today + 6 future days)
             this.weatherData = {
                 current: {
-                    temp: data.temp,
-                    city: data.city_name,
-                    condition: data.condition_slug,
-                    description: data.description,
+                    temp: results.temp,
+                    city: results.city_name || results.city,
+                    condition: results.condition_slug,
+                    description: results.description,
                     date: new Date().toLocaleDateString('pt-BR', { 
                         weekday: 'long', 
                         day: 'numeric', 
@@ -547,26 +582,42 @@ class DrivingProApp {
                     })
                 },
                 // Include today + next 6 days for a total of 7 days
-                forecast: data.forecast ? data.forecast.slice(0, 6) : [], // Next 6 days after today
+                forecast: results.forecast ? results.forecast.slice(0, 6) : [], // Next 6 days after today
                 lastUpdate: new Date()
             };
             
+            console.log('Processed weather data:', this.weatherData);
             this.updateWeatherDisplay();
             
         } catch (error) {
             console.error('Weather data fetch failed:', error);
-            this.handleWeatherError();
+            console.log('Showing demo weather data...');
+            this.loadDemoWeatherData();
         }
     }
 
     updateWeatherDisplay() {
+        console.log('Updating weather display...');
+        this.clearLoadingStates();
         this.updateCurrentWeatherIcon();
         this.updateForecastIcons();
     }
 
+    clearLoadingStates() {
+        // Remove any loading elements
+        const loadingElements = document.querySelectorAll('.weather-loading');
+        loadingElements.forEach(el => el.remove());
+        console.log('Cleared loading states');
+    }
+
     updateCurrentWeatherIcon() {
         const currentWeatherEl = document.getElementById('currentWeatherIcon');
-        if (!currentWeatherEl || !this.weatherData.current) return;
+        if (!currentWeatherEl || !this.weatherData.current) {
+            console.log('No current weather element or current data found');
+            return;
+        }
+        
+        console.log('Updating current weather icon with data:', this.weatherData.current);
         
         const { condition, description } = this.weatherData.current;
         const iconUrl = `./icons/weather/${condition}.svg`;
@@ -576,25 +627,34 @@ class DrivingProApp {
                 <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
             </div>
         `;
+        
+        console.log('Current weather icon updated successfully');
     }
 
     updateForecastIcons() {
         const forecastEl = document.getElementById('forecastIcons');
-        if (!forecastEl || !this.weatherData.forecast) return;
+        if (!forecastEl || !this.weatherData.forecast) {
+            console.log('No forecast element or forecast data found');
+            return;
+        }
         
-        const forecastHtml = this.weatherData.forecast.map(day => {
-            const iconUrl = `./icons/weather/${day.condition}.svg`;
+        console.log('Updating forecast icons with data:', this.weatherData.forecast);
+        
+        const forecastHtml = this.weatherData.forecast.map((day, index) => {
+            const condition = day.condition || day.condition_slug || 'clear_day';
+            const iconUrl = `./icons/weather/${condition}.svg`;
             
             return `
-                <div class="weather-day forecast-day">
+                <div class="weather-day forecast-day" title="${day.description || 'Previsão'}">
                     <div class="weather-icon-container">
-                        <img src="${iconUrl}" alt="${day.description}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
+                        <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
                     </div>
                 </div>
             `;
         }).join('');
         
         forecastEl.innerHTML = forecastHtml;
+        console.log('Forecast icons updated successfully');
     }
 
     getDayInitial(weekday) {
@@ -619,37 +679,8 @@ class DrivingProApp {
     }
 
     handleWeatherError() {
-        // Show fallback weather display
-        const currentWeatherEl = document.getElementById('currentWeatherIcon');
-        const forecastEl = document.getElementById('forecastIcons');
-        
-        if (currentWeatherEl) {
-            currentWeatherEl.innerHTML = `
-                <div class="weather-icon-container">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="weather-icon">
-                        <circle cx="12" cy="12" r="5"/>
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                    </svg>
-                </div>
-            `;
-        }
-        
-        if (forecastEl) {
-            const forecastHtml = Array.from({length: 6}, (_, i) => {
-                return `
-                    <div class="weather-day forecast-day">
-                        <div class="weather-icon-container">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="weather-icon">
-                                <circle cx="12" cy="12" r="5"/>
-                                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                            </svg>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            forecastEl.innerHTML = forecastHtml;
-        }
+        console.log('Handling weather error, loading demo data...');
+        this.loadDemoWeatherData();
     }
 
     startWeatherUpdates() {
@@ -665,6 +696,47 @@ class DrivingProApp {
     async refreshWeather() {
         console.log('Manual weather refresh requested');
         return await this.loadWeatherData();
+    }
+
+    // Load demo weather data for testing/demo purposes
+    loadDemoWeatherData() {
+        console.log('Loading demo weather data...');
+        
+        // Create realistic demo data
+        const demoConditions = ['clear_day', 'cloud', 'rain', 'cloudly_day', 'cloudly_night', 'storm'];
+        const demoTemp = Math.floor(Math.random() * 15) + 15; // 15-30°C
+        
+        this.weatherData = {
+            current: {
+                temp: demoTemp,
+                city: 'São Paulo',
+                condition: 'clear_day',
+                description: 'Ensolarado',
+                date: new Date().toLocaleDateString('pt-BR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'short' 
+                })
+            },
+            forecast: Array.from({length: 6}, (_, i) => {
+                const futureDate = new Date();
+                futureDate.setDate(futureDate.getDate() + i + 1);
+                
+                return {
+                    condition: demoConditions[Math.floor(Math.random() * demoConditions.length)],
+                    description: 'Previsão',
+                    date: futureDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                    weekday: futureDate.toLocaleDateString('pt-BR', { weekday: 'short' }),
+                    max: Math.floor(Math.random() * 10) + 20,
+                    min: Math.floor(Math.random() * 10) + 10
+                };
+            }),
+            lastUpdate: new Date(),
+            isDemo: true
+        };
+        
+        console.log('Demo weather data loaded:', this.weatherData);
+        this.updateWeatherDisplay();
     }
 
     // Public method to get current weather data
