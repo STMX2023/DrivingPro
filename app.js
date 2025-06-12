@@ -614,12 +614,12 @@ class DrivingProApp {
         console.log('Updating current weather icon with data:', this.weatherData.current);
         
         const { condition, description, temp } = this.weatherData.current;
-        const mappedCondition = this.mapWeatherCondition(condition);
-        const iconUrl = `./icons/weather/${mappedCondition}.svg`;
+        const iconUrl = this.getWeatherIconUrl(condition);
+        const fallbackIconUrl = 'https://assets.hgbrasil.com/weather/icons/conditions/clear_day.svg';
         
         currentWeatherEl.innerHTML = `
             <div class="weather-icon-container">
-                <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
+                <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
             </div>
             <div class="weather-temp">${temp}°</div>
         `;
@@ -636,10 +636,11 @@ class DrivingProApp {
         
         console.log('Updating forecast icons with data:', this.weatherData.forecast);
         
+        const fallbackIconUrl = 'https://assets.hgbrasil.com/weather/icons/conditions/clear_day.svg';
+        
         const forecastHtml = this.weatherData.forecast.map((day, index) => {
-            // Ensure accurate icon mapping
-            const condition = this.mapWeatherCondition(day.condition || day.condition_slug || 'clear_day');
-            const iconUrl = `./icons/weather/${condition}.svg`;
+            // Get icon URL from HG Brasil API
+            const iconUrl = this.getWeatherIconUrl(day.condition || day.condition_slug || 'clear_day');
             
             // Get both max and min temperatures
             const maxTemp = day.max || day.temp || Math.floor(Math.random() * 10) + 20;
@@ -648,7 +649,7 @@ class DrivingProApp {
             return `
                 <div class="weather-day forecast-day" title="${day.description || 'Previsão'} - ${maxTemp}°/${minTemp}°">
                     <div class="weather-icon-container">
-                        <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
+                        <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
                     </div>
                     <div class="weather-temps">
                         <div class="weather-temp max-temp">${maxTemp}°</div>
@@ -662,8 +663,10 @@ class DrivingProApp {
         console.log('Forecast icons updated successfully');
     }
 
-    mapWeatherCondition(condition) {
-        // Map API condition codes to available icon names
+    getWeatherIconUrl(condition) {
+        // Map API condition codes to HG Brasil icon URLs
+        const baseUrl = 'https://assets.hgbrasil.com/weather/icons/conditions/';
+        
         const conditionMap = {
             // Clear conditions
             'clear_day': 'clear_day',
@@ -712,33 +715,29 @@ class DrivingProApp {
         const mappedCondition = conditionMap[condition.toLowerCase()];
         if (mappedCondition) {
             console.log(`Mapped condition '${condition}' to '${mappedCondition}'`);
-            return mappedCondition;
+            return `${baseUrl}${mappedCondition}.svg`;
         }
         
         // If not found, try to intelligently guess based on keywords
         const lowerCondition = condition.toLowerCase();
+        let fallbackCondition = 'clear_day';
         
         if (lowerCondition.includes('rain') || lowerCondition.includes('chuva')) {
-            return lowerCondition.includes('light') || lowerCondition.includes('leve') ? 'drizzle' : 'rain';
-        }
-        if (lowerCondition.includes('storm') || lowerCondition.includes('tempestade')) {
-            return 'storm';
-        }
-        if (lowerCondition.includes('cloud') || lowerCondition.includes('nuvem')) {
-            return 'cloud';
-        }
-        if (lowerCondition.includes('clear') || lowerCondition.includes('limpo') || lowerCondition.includes('sol')) {
-            return 'clear_day';
-        }
-        if (lowerCondition.includes('snow') || lowerCondition.includes('neve')) {
-            return 'snow';
-        }
-        if (lowerCondition.includes('fog') || lowerCondition.includes('neblina')) {
-            return 'fog';
+            fallbackCondition = lowerCondition.includes('light') || lowerCondition.includes('leve') ? 'drizzle' : 'rain';
+        } else if (lowerCondition.includes('storm') || lowerCondition.includes('tempestade')) {
+            fallbackCondition = 'storm';
+        } else if (lowerCondition.includes('cloud') || lowerCondition.includes('nuvem')) {
+            fallbackCondition = 'cloud';
+        } else if (lowerCondition.includes('clear') || lowerCondition.includes('limpo') || lowerCondition.includes('sol')) {
+            fallbackCondition = 'clear_day';
+        } else if (lowerCondition.includes('snow') || lowerCondition.includes('neve')) {
+            fallbackCondition = 'snow';
+        } else if (lowerCondition.includes('fog') || lowerCondition.includes('neblina')) {
+            fallbackCondition = 'fog';
         }
         
-        console.warn(`Unknown weather condition '${condition}', falling back to clear_day`);
-        return 'clear_day'; // Default fallback
+        console.warn(`Unknown weather condition '${condition}', falling back to ${fallbackCondition}`);
+        return `${baseUrl}${fallbackCondition}.svg`;
     }
 
     getDayInitial(weekday) {
