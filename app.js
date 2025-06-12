@@ -534,16 +534,16 @@ class DrivingProApp {
         if (!currentWeatherEl || !this.weatherData.current) return;
         
         const { temp, condition, description, city } = this.weatherData.current;
-        const iconUrl = `https://assets.hgbrasil.com/weather/icons/conditions/${condition}.svg`;
+        const iconUrl = `./icons/weather/${condition}.svg`;
         
         currentWeatherEl.innerHTML = `
             <div class="current-weather-content">
                 <div class="weather-icon-container">
-                    <img src="${iconUrl}" alt="${description}" class="current-weather-icon" />
+                    <img src="${iconUrl}" alt="${description}" class="current-weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
                 </div>
                 <div class="current-weather-info">
                     <div class="current-temp">${temp}°</div>
-                    <div class="current-label">Hoje</div>
+                    <div class="current-label">hoje</div>
                 </div>
             </div>
         `;
@@ -554,12 +554,12 @@ class DrivingProApp {
         if (!forecastEl || !this.weatherData.forecast) return;
         
         const forecastHtml = this.weatherData.forecast.map(day => {
-            const iconUrl = `https://assets.hgbrasil.com/weather/icons/conditions/${day.condition}.svg`;
+            const iconUrl = `./icons/weather/${day.condition}.svg`;
             const dayInitial = this.getDayInitial(day.weekday);
             
             return `
                 <div class="forecast-day">
-                    <img src="${iconUrl}" alt="${day.description}" class="forecast-icon" />
+                    <img src="${iconUrl}" alt="${day.description}" class="forecast-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
                     <span class="forecast-day-label">${dayInitial}</span>
                 </div>
             `;
