@@ -337,7 +337,7 @@ self.addEventListener('message', (event) => {
         default:
             console.log('Service Worker: Unknown message type', type);
     }
-});
+}); 
 
 // Handle force update request
 async function handleForceUpdate() {
