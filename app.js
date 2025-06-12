@@ -566,6 +566,8 @@ class DrivingProApp {
             this.weatherData = {
                 current: {
                     temp: results.temp,
+                    max: results.max, // Today's max temperature
+                    min: results.min, // Today's min temperature
                     city: results.city_name || results.city,
                     condition: results.condition_slug,
                     description: results.description,
@@ -613,15 +615,21 @@ class DrivingProApp {
         
         console.log('Updating current weather icon with data:', this.weatherData.current);
         
-        const { condition, description, temp } = this.weatherData.current;
+        const { condition, description, temp, max, min } = this.weatherData.current;
         const iconUrl = this.getWeatherIconUrl(condition);
         const fallbackIconUrl = 'https://assets.hgbrasil.com/weather/icons/conditions/clear_day.svg';
+        
+        // Use max/min if available, otherwise show current temp
+        const hasMinMax = max !== undefined && min !== undefined;
         
         currentWeatherEl.innerHTML = `
             <div class="weather-icon-container">
                 <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
             </div>
-            <div class="weather-temp">${temp}°</div>
+            <div class="weather-temps">
+                <div class="weather-temp max-temp">${hasMinMax ? max : temp}°</div>
+                ${hasMinMax ? `<div class="weather-temp min-temp">${min}°</div>` : ''}
+            </div>
         `;
         
         console.log('Current weather icon updated successfully');
@@ -797,6 +805,8 @@ class DrivingProApp {
         this.weatherData = {
             current: {
                 temp: demoTemp,
+                max: demoTemp + Math.floor(Math.random() * 5) + 2, // Max temp higher than current
+                min: demoTemp - Math.floor(Math.random() * 5) - 2, // Min temp lower than current
                 city: 'São Paulo',
                 condition: 'clear_day',
                 description: 'Ensolarado',
