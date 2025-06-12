@@ -1,12 +1,9 @@
 // DrivingPro PWA Application
 // Enhanced iOS-style interface with dynamic theming
 //
-// Weather Feature Setup:
-// 1. Get your free API key from: https://console.hgbrasil.com/
-// 2. Replace 'null' in weatherApiKey with your key
-// 3. Uncomment the loadWeatherData() call in initializeWeatherSystem()
-// 
-// Current status: Running in demo mode with sample weather data
+// Weather Feature: Configured with HG Weather API
+// API Documentation: https://console.hgbrasil.com/documentation/weather
+// Current status: Using real weather data with automatic location detection
 class DrivingProApp {
     constructor() {
         this.currentTab = 'home';
@@ -16,7 +13,7 @@ class DrivingProApp {
         this.locationWatchId = null;
         this.currentTheme = 'light';
         this.weatherData = {};
-        this.weatherApiKey = null; // Will work without key for demo, add your key for full features
+        this.weatherApiKey = 'e65d53c6'; // HG Weather API key
         this.init();
     }
 
@@ -506,17 +503,14 @@ class DrivingProApp {
         console.log('Initializing weather system...');
         this.setupWeatherDisplay();
         
-        // For now, always use demo data until user provides API key
-        console.log('Using demo weather data (no API key provided)');
-        this.loadDemoWeatherData();
-        
-        // Uncomment below when user provides API key
-        // try {
-        //     await this.loadWeatherData();
-        // } catch (error) {
-        //     console.error('Weather system initialization failed, using demo data:', error);
-        //     this.loadDemoWeatherData();
-        // }
+        // Try to load real weather data with API key
+        try {
+            await this.loadWeatherData();
+            console.log('Real weather data loaded successfully');
+        } catch (error) {
+            console.error('Weather system initialization failed, using demo data:', error);
+            this.loadDemoWeatherData();
+        }
         
         this.startWeatherUpdates();
     }
@@ -685,11 +679,16 @@ class DrivingProApp {
 
     startWeatherUpdates() {
         // Update weather every 30 minutes
-        setInterval(() => {
-            this.loadWeatherData();
+        setInterval(async () => {
+            try {
+                await this.loadWeatherData();
+                console.log('Weather data refreshed automatically');
+            } catch (error) {
+                console.error('Automatic weather refresh failed:', error);
+            }
         }, 30 * 60 * 1000); // 30 minutes
         
-        console.log('Weather update interval started');
+        console.log('Weather update interval started (30 min intervals)');
     }
 
     // Public method to manually refresh weather
