@@ -1012,13 +1012,8 @@ class DrivingProApp {
     }
 
     setupEventListeners() {
-        // Tab navigation
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                this.switchTab(item.dataset.tab);
-            });
-        });
+        // Enhanced navigation
+        this.setupEnhancedNavigation();
 
         // Card interactions
         const cards = document.querySelectorAll('.card');
@@ -1049,28 +1044,149 @@ class DrivingProApp {
         this.addTouchFeedback();
     }
 
+    setupEnhancedNavigation() {
+        const navToggle = document.getElementById('navToggle');
+        const navItems = document.querySelectorAll('.nav-item-enhanced');
+        const floatingParticles = document.getElementById('floatingParticles');
+        
+        let isExpanded = false;
+        let currentActiveTab = 'home';
+
+        // Toggle navigation expansion
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isExpanded = !isExpanded;
+            
+            // Haptic feedback
+            this.hapticFeedback(isExpanded ? 'medium' : 'light');
+            
+            // Toggle expanded state
+            navToggle.classList.toggle('expanded', isExpanded);
+            
+            // Create floating particles if expanding
+            if (isExpanded) {
+                this.createFloatingParticles();
+            } else {
+                this.clearFloatingParticles();
+            }
+        });
+
+        // Handle navigation item clicks
+        navItems.forEach((item, index) => {
+            // Touch/Mouse down - start ripple effect
+            const addRippleEffect = (e) => {
+                const color = item.dataset.color;
+                const ripple = item.querySelector('.ripple-effect');
+                
+                // Set ripple color
+                ripple.style.background = `radial-gradient(circle, ${color}30 0%, transparent 70%)`;
+                
+                // Add ripple animation
+                item.classList.add('ripple-active');
+                
+                // Haptic feedback
+                this.hapticFeedback('light');
+                
+                // Remove ripple effect after animation
+                setTimeout(() => {
+                    item.classList.remove('ripple-active');
+                }, 600);
+            };
+
+            item.addEventListener('mousedown', addRippleEffect);
+            item.addEventListener('touchstart', addRippleEffect);
+
+            // Handle tab switching
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const tabName = item.dataset.tab;
+                
+                // Switch active state
+                navItems.forEach(navItem => navItem.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Switch tab content
+                this.switchTab(tabName);
+                currentActiveTab = tabName;
+                
+                // Stronger haptic feedback for tab switch
+                this.hapticFeedback('medium');
+                
+                // Collapse navigation after selection
+                setTimeout(() => {
+                    isExpanded = false;
+                    navToggle.classList.remove('expanded');
+                    this.clearFloatingParticles();
+                }, 500);
+            });
+        });
+
+        // Close navigation when clicking outside
+        document.addEventListener('click', (e) => {
+            if (isExpanded && !navToggle.contains(e.target)) {
+                isExpanded = false;
+                navToggle.classList.remove('expanded');
+                this.clearFloatingParticles();
+            }
+        });
+    }
+
+    createFloatingParticles() {
+        const particlesContainer = document.getElementById('floatingParticles');
+        particlesContainer.innerHTML = '';
+        
+        // Create 8 floating particles
+        for (let i = 0; i < 8; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random positioning
+            particle.style.left = `${20 + i * 10}%`;
+            particle.style.bottom = `${15 + (i % 3) * 5}%`;
+            particle.style.animationDelay = `${i * 0.2}s`;
+            particle.style.animationDuration = `${3 + i * 0.3}s`;
+            
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    clearFloatingParticles() {
+        const particlesContainer = document.getElementById('floatingParticles');
+        if (particlesContainer) {
+            particlesContainer.innerHTML = '';
+        }
+    }
+
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
 
-        // Update navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
+        // Update enhanced navigation
+        document.querySelectorAll('.nav-item-enhanced').forEach(item => {
             item.classList.remove('active');
         });
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        const activeNavItem = document.querySelector(`.nav-item-enhanced[data-tab="${tabName}"]`);
+        if (activeNavItem) {
+            activeNavItem.classList.add('active');
+        }
 
-        // Update content
+        // Update content with fade transition
         document.querySelectorAll('.content-section').forEach(section => {
             section.classList.remove('active');
         });
-        document.getElementById(tabName).classList.add('active');
+        
+        const targetSection = document.getElementById(tabName);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
 
         this.currentTab = tabName;
         
         // Animate new content
         this.animateCards();
         
-        // Add haptic feedback (if supported)
-        this.hapticFeedback('light');
+        console.log(`Switched to tab: ${tabName}`);
     }
 
     handleCardClick(card, event) {
@@ -1119,7 +1235,7 @@ class DrivingProApp {
     }
 
     addTouchFeedback() {
-        const interactiveElements = document.querySelectorAll('.card, .nav-item, .header-btn');
+        const interactiveElements = document.querySelectorAll('.card, .nav-item-enhanced, .nav-toggle, .header-btn');
         
         interactiveElements.forEach(element => {
             element.addEventListener('touchstart', () => {
