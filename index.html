@@ -27,9 +27,23 @@
     <div class="app-container">
         <!-- Header -->
         <header class="header">
-            <div class="placeholder-boxes">
-                <div class="placeholder-square"></div>
-                <div class="placeholder-rect"></div>
+            <div class="weather-widget">
+                <div id="currentWeather" class="current-weather-box">
+                    <div class="current-weather-content loading">
+                        <div class="weather-icon-container">
+                            <div class="weather-loading"></div>
+                        </div>
+                        <div class="current-weather-info">
+                            <div class="current-temp">--°</div>
+                            <div class="current-label">Hoje</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="weatherForecast" class="weather-forecast-box">
+                    <div class="forecast-container loading">
+                        <div class="forecast-loading"></div>
+                    </div>
+                </div>
             </div>
             <div class="app-icon">
                 <span class="icon-d">D</span>
