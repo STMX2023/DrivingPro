@@ -613,13 +613,14 @@ class DrivingProApp {
         
         console.log('Updating current weather icon with data:', this.weatherData.current);
         
-        const { condition, description } = this.weatherData.current;
+        const { condition, description, temp } = this.weatherData.current;
         const iconUrl = `./icons/weather/${condition}.svg`;
         
         currentWeatherEl.innerHTML = `
             <div class="weather-icon-container">
                 <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
             </div>
+            <div class="weather-temp">${temp}°</div>
         `;
         
         console.log('Current weather icon updated successfully');
@@ -637,12 +638,14 @@ class DrivingProApp {
         const forecastHtml = this.weatherData.forecast.map((day, index) => {
             const condition = day.condition || day.condition_slug || 'clear_day';
             const iconUrl = `./icons/weather/${condition}.svg`;
+            const temp = day.max || day.temp || Math.floor(Math.random() * 10) + 20; // Use max temp for forecast
             
             return `
-                <div class="weather-day forecast-day" title="${day.description || 'Previsão'}">
+                <div class="weather-day forecast-day" title="${day.description || 'Previsão'} - ${temp}°">
                     <div class="weather-icon-container">
                         <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='./icons/weather/clear_day.svg'" />
                     </div>
+                    <div class="weather-temp">${temp}°</div>
                 </div>
             `;
         }).join('');

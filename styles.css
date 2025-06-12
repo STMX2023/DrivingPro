@@ -239,29 +239,32 @@ body {
 /* Weather Day Container */
 .weather-day {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--radius-xl);
     position: relative;
     transition: all 0.3s var(--ease-out-cubic);
+    padding: var(--space-2);
+    gap: var(--space-1);
 }
 
-/* Current Day (Larger Circle) */
+/* Current Day (Larger Container) */
 .weather-day.current-day {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 70px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .weather-day.current-day .weather-icon-container {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
 }
 
 .weather-day.current-day .weather-icon {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
 }
 
 /* Forecast Days Container */
@@ -271,22 +274,22 @@ body {
     gap: var(--space-1);
 }
 
-/* Forecast Day (Smaller Circles) */
+/* Forecast Day (Smaller Containers) */
 .weather-day.forecast-day {
-    width: 24px;
-    height: 24px;
+    width: 42px;
+    height: 52px;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .weather-day.forecast-day .weather-icon-container {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
 }
 
 .weather-day.forecast-day .weather-icon {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
 }
 
 /* Weather Icon Container */
@@ -302,6 +305,22 @@ body {
     object-fit: contain;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
     transition: all 0.3s var(--ease-out-cubic);
+}
+
+/* Weather Temperature Text */
+.weather-temp {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.weather-day.current-day .weather-temp {
+    font-size: 12px;
+    font-weight: 700;
 }
 
 /* Hover Effects */
@@ -1030,6 +1049,11 @@ body {
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
+[data-theme="dark"] .weather-temp {
+    color: var(--text-primary);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 [data-theme="dark"] .bottom-nav {
     background: var(--surface-overlay);
     border-top: 1px solid rgba(68, 68, 68, 0.4);
@@ -1146,6 +1170,11 @@ body {
 
     :root:not([data-theme]) .weather-icon {
         filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    }
+
+    :root:not([data-theme]) .weather-temp {
+        color: var(--text-primary);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
     
     :root:not([data-theme]) .bottom-nav {
