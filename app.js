@@ -1009,14 +1009,6 @@ class DrivingProApp {
     }
 
     setupEventListeners() {
-        // Tab navigation
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                this.switchTab(item.dataset.tab);
-            });
-        });
-
         // Card interactions
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
@@ -1048,12 +1040,6 @@ class DrivingProApp {
 
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
-
-        // Update navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
         // Update content
         document.querySelectorAll('.content-section').forEach(section => {
@@ -1116,7 +1102,7 @@ class DrivingProApp {
     }
 
     addTouchFeedback() {
-        const interactiveElements = document.querySelectorAll('.card, .nav-item, .header-btn');
+        const interactiveElements = document.querySelectorAll('.card, .header-btn');
         
         interactiveElements.forEach(element => {
             element.addEventListener('touchstart', () => {
@@ -1440,6 +1426,11 @@ class DrivingProApp {
 // Initialize app when DOM loads
 document.addEventListener('DOMContentLoaded', () => {
     window.drivingProApp = new DrivingProApp();
+    
+    // Initialize side menu
+    if (window.SideMenu) {
+        window.sideMenu = new SideMenu();
+    }
 });
 
 // Handle online/offline status
