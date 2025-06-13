@@ -624,9 +624,7 @@ class DrivingProApp {
         const minToShow = (min !== undefined && min !== null) ? min : temp;
         
         currentWeatherEl.innerHTML = `
-            <div class="weather-icon-container">
-                <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
-            </div>
+            <img src="${iconUrl}" alt="${description}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
             <div class="weather-temps">
                 <div class="weather-temp max-temp">${maxToShow}°</div>
                 <div class="weather-temp min-temp">${minToShow}°</div>
@@ -657,9 +655,7 @@ class DrivingProApp {
             
             return `
                 <div class="weather-day forecast-day" title="${day.description || 'Previsão'} - ${maxTemp}°/${minTemp}°">
-                    <div class="weather-icon-container">
-                        <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
-                    </div>
+                    <img src="${iconUrl}" alt="${day.description || 'Previsão'}" class="weather-icon" onerror="this.src='${fallbackIconUrl}'" />
                     <div class="weather-temps">
                         <div class="weather-temp max-temp">${maxTemp}°</div>
                         <div class="weather-temp min-temp">${minTemp}°</div>

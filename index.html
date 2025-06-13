@@ -27,22 +27,22 @@
     <div class="app-container">
         <!-- Header -->
         <header class="header">
-            <div class="weather-widget">
-                <div id="weatherTimeline" class="weather-timeline">
-                    <!-- Current day (larger) -->
-                    <div id="currentWeatherIcon" class="weather-day current-day">
-                        <div class="weather-icon-container">
-                            <div class="weather-loading"></div>
-                        </div>
-                    </div>
-                    <!-- Next 6 days (smaller) -->
-                    <div id="forecastIcons" class="forecast-days">
-                        <!-- Generated dynamically -->
-                    </div>
-                </div>
+            <div class="hamburger-menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
             </div>
-            <div class="app-icon">
-                <span class="icon-d">D</span>
+            <div id="weatherTimeline" class="weather-timeline">
+                <!-- Current day (larger) -->
+                <div id="currentWeatherIcon" class="weather-day current-day">
+                    <div class="weather-loading"></div>
+                </div>
+                <!-- Next 6 days (smaller) -->
+                <div id="forecastIcons" class="forecast-days">
+                    <!-- Generated dynamically -->
+                </div>
             </div>
         </header>
 
