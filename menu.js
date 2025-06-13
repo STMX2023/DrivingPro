@@ -114,7 +114,13 @@ class SideMenu {
         this.hamburgerBtn = document.querySelector('.hamburger-menu');
         
         if (this.hamburgerBtn) {
-            this.hamburgerBtn.addEventListener('click', () => this.toggleMenu());
+            this.hamburgerBtn.addEventListener('click', () => {
+                // Add haptic feedback for hamburger button
+                if (navigator.vibrate) {
+                    navigator.vibrate(40);
+                }
+                this.toggleMenu();
+            });
         }
 
         // Close button

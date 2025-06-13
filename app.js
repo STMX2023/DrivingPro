@@ -18,6 +18,27 @@ class DrivingProApp {
         this.tripsPage = null; // Will be initialized when needed
         this.earningsPage = null; // Will be initialized when needed
         this.settingsPage = null; // Will be initialized when needed
+        
+        // Swipe navigation properties
+        this.swipeData = {
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0,
+            startTime: 0,
+            endTime: 0,
+            isSwipeInProgress: false,
+            minSwipeDistance: 50,
+            maxSwipeTime: 300,
+            swipeThreshold: 100
+        };
+        
+        // Define page order for navigation
+        this.pageOrder = ['home', 'practice', 'stats', 'profile'];
+        
+        // Performance optimization flag
+        this.isSwipeNavigation = false;
+        
         this.init();
     }
 
@@ -1043,6 +1064,9 @@ class DrivingProApp {
 
         // Add touch feedback
         this.addTouchFeedback();
+        
+        // Setup swipe navigation
+        this.setupSwipeNavigation();
     }
 
     switchTab(tabName) {
@@ -1067,11 +1091,19 @@ class DrivingProApp {
 
         this.currentTab = tabName;
         
-        // Animate new content
-        this.animateCards();
+        // Only animate if NOT a swipe navigation (for performance)
+        if (!this.isSwipeNavigation) {
+            this.animateCards();
+        } else {
+            // Fast fade-in for swipe navigation
+            this.quickFadeInCards();
+        }
         
         // Add haptic feedback (if supported)
         this.hapticFeedback('light');
+        
+        // Reset swipe flag
+        this.isSwipeNavigation = false;
     }
 
     loadHomePage() {
@@ -1086,9 +1118,10 @@ class DrivingProApp {
             homeSection.innerHTML = this.homePage.render();
             
             // Initialize home page functionality
+            const delay = this.isSwipeNavigation ? 0 : 100; // No delay for swipe
             setTimeout(() => {
                 this.homePage.initialize();
-            }, 100); // Small delay to ensure DOM is updated
+            }, delay);
         }
     }
 
@@ -1104,9 +1137,10 @@ class DrivingProApp {
             tripsSection.innerHTML = this.tripsPage.render();
             
             // Initialize trips page functionality
+            const delay = this.isSwipeNavigation ? 0 : 100; // No delay for swipe
             setTimeout(() => {
                 this.tripsPage.initialize();
-            }, 100); // Small delay to ensure DOM is updated
+            }, delay);
         }
     }
 
@@ -1122,9 +1156,10 @@ class DrivingProApp {
             earningsSection.innerHTML = this.earningsPage.render();
             
             // Initialize earnings page functionality
+            const delay = this.isSwipeNavigation ? 0 : 100; // No delay for swipe
             setTimeout(() => {
                 this.earningsPage.initialize();
-            }, 100); // Small delay to ensure DOM is updated
+            }, delay);
         }
     }
 
@@ -1140,9 +1175,10 @@ class DrivingProApp {
             settingsSection.innerHTML = this.settingsPage.render();
             
             // Initialize settings page functionality
+            const delay = this.isSwipeNavigation ? 0 : 100; // No delay for swipe
             setTimeout(() => {
                 this.settingsPage.initialize();
-            }, 100); // Small delay to ensure DOM is updated
+            }, delay);
         }
     }
 
@@ -1189,6 +1225,27 @@ class DrivingProApp {
                 card.style.transform = 'translateY(0)';
             }, index * 100);
         });
+    }
+
+    quickFadeInCards() {
+        // Fast animation for swipe navigation - no staggered delays
+        const cards = document.querySelectorAll('.content-section.active .card');
+        cards.forEach((card) => {
+            card.style.transition = 'opacity 0.2s ease';
+            card.style.opacity = '0';
+            
+            // Use requestAnimationFrame for smoother performance
+            requestAnimationFrame(() => {
+                card.style.opacity = '1';
+            });
+        });
+        
+        // Clean up transition after animation
+        setTimeout(() => {
+            cards.forEach(card => {
+                card.style.transition = '';
+            });
+        }, 200);
     }
 
     addTouchFeedback() {
@@ -1510,6 +1567,199 @@ class DrivingProApp {
             }
             badge.textContent = count;
         }
+    }
+
+    setupSwipeNavigation() {
+        const mainContent = document.querySelector('.main-content');
+        if (!mainContent) return;
+
+        // Touch start event
+        mainContent.addEventListener('touchstart', (e) => {
+            this.handleTouchStart(e);
+        }, { passive: false });
+
+        // Touch move event
+        mainContent.addEventListener('touchmove', (e) => {
+            this.handleTouchMove(e);
+        }, { passive: false });
+
+        // Touch end event
+        mainContent.addEventListener('touchend', (e) => {
+            this.handleTouchEnd(e);
+        }, { passive: false });
+
+        console.log('✅ Swipe navigation enabled');
+    }
+
+    handleTouchStart(e) {
+        // Only handle single touches
+        if (e.touches.length !== 1) return;
+
+        const touch = e.touches[0];
+        this.swipeData.startX = touch.clientX;
+        this.swipeData.startY = touch.clientY;
+        this.swipeData.startTime = Date.now();
+        this.swipeData.isSwipeInProgress = true;
+
+        // Visual feedback - slight dim
+        const activeSection = document.querySelector('.content-section.active');
+        if (activeSection) {
+            activeSection.style.transition = 'opacity 0.1s ease';
+            activeSection.style.opacity = '0.95';
+        }
+    }
+
+    handleTouchMove(e) {
+        if (!this.swipeData.isSwipeInProgress || e.touches.length !== 1) return;
+
+        const touch = e.touches[0];
+        this.swipeData.endX = touch.clientX;
+        this.swipeData.endY = touch.clientY;
+
+        const deltaX = this.swipeData.endX - this.swipeData.startX;
+        const deltaY = this.swipeData.endY - this.swipeData.startY;
+
+        // Check if this is a horizontal swipe (not vertical scroll)
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+            // Prevent vertical scrolling during horizontal swipe
+            e.preventDefault();
+
+            // Visual feedback during swipe
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection && Math.abs(deltaX) > 30) {
+                const opacity = Math.max(0.7, 1 - Math.abs(deltaX) / 200);
+                activeSection.style.opacity = opacity.toString();
+            }
+        }
+    }
+
+    handleTouchEnd(e) {
+        if (!this.swipeData.isSwipeInProgress) return;
+
+        this.swipeData.endTime = Date.now();
+        this.swipeData.isSwipeInProgress = false;
+
+        // Reset visual feedback
+        const activeSection = document.querySelector('.content-section.active');
+        if (activeSection) {
+            activeSection.style.transition = '';
+            activeSection.style.opacity = '';
+        }
+
+        this.analyzeSwipeGesture();
+    }
+
+    analyzeSwipeGesture() {
+        const deltaX = this.swipeData.endX - this.swipeData.startX;
+        const deltaY = this.swipeData.endY - this.swipeData.startY;
+        const deltaTime = this.swipeData.endTime - this.swipeData.startTime;
+
+        // Check if this qualifies as a valid swipe
+        const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+        const isValidDistance = Math.abs(deltaX) >= this.swipeData.minSwipeDistance;
+        const isValidSpeed = deltaTime <= this.swipeData.maxSwipeTime;
+        const isSignificantSwipe = Math.abs(deltaX) >= this.swipeData.swipeThreshold;
+
+        if (isHorizontalSwipe && isValidDistance && (isValidSpeed || isSignificantSwipe)) {
+            const direction = deltaX > 0 ? 'right' : 'left';
+            this.handleSwipeNavigation(direction);
+        }
+    }
+
+    handleSwipeNavigation(direction) {
+        const currentIndex = this.pageOrder.indexOf(this.currentTab);
+        let targetIndex = currentIndex;
+
+        if (direction === 'right' && currentIndex > 0) {
+            // Swipe right = go to previous page
+            targetIndex = currentIndex - 1;
+        } else if (direction === 'left' && currentIndex < this.pageOrder.length - 1) {
+            // Swipe left = go to next page
+            targetIndex = currentIndex + 1;
+        }
+
+        if (targetIndex !== currentIndex) {
+            const targetTab = this.pageOrder[targetIndex];
+            
+            // Set performance flag for faster navigation
+            this.isSwipeNavigation = true;
+            
+            // Add haptic feedback for successful swipe
+            this.hapticFeedback('medium');
+            
+            // Minimal swipe animation for instant response
+            this.animateSwipeTransition(direction);
+            
+            // Navigate to target page immediately (reduced delay)
+            setTimeout(() => {
+                this.switchTab(targetTab);
+                
+                // Update drawer menu active state if drawer is visible
+                if (window.sideMenuInstance) {
+                    window.sideMenuInstance.updateActiveMenuItem(targetTab);
+                }
+            }, 50); // Reduced from 150ms to 50ms
+
+            console.log(`🔄 Swipe ${direction}: ${this.currentTab} → ${targetTab}`);
+        } else {
+            // Edge of navigation - bounce feedback
+            this.animateBounceEdge(direction);
+            this.hapticFeedback('light');
+        }
+    }
+
+    animateSwipeTransition(direction) {
+        const activeSection = document.querySelector('.content-section.active');
+        if (!activeSection) return;
+
+        const translateX = direction === 'left' ? '-5px' : '5px'; // Reduced movement
+        
+        activeSection.style.transition = 'transform 0.1s ease-out'; // Faster transition
+        activeSection.style.transform = `translateX(${translateX})`;
+        
+        setTimeout(() => {
+            activeSection.style.transform = '';
+            setTimeout(() => {
+                activeSection.style.transition = '';
+            }, 100); // Faster cleanup
+        }, 100); // Faster reset
+    }
+
+    animateBounceEdge(direction) {
+        const activeSection = document.querySelector('.content-section.active');
+        if (!activeSection) return;
+
+        const translateX = direction === 'left' ? '-3px' : '3px'; // Reduced movement
+        
+        activeSection.style.transition = 'transform 0.08s ease-out'; // Even faster
+        activeSection.style.transform = `translateX(${translateX})`;
+        
+        setTimeout(() => {
+            activeSection.style.transform = '';
+            setTimeout(() => {
+                activeSection.style.transition = '';
+            }, 80); // Faster cleanup
+        }, 80); // Faster reset
+    }
+
+    // Get current page info for debugging/display
+    getCurrentPageInfo() {
+        const currentIndex = this.pageOrder.indexOf(this.currentTab);
+        const pageTitles = {
+            'home': 'Home',
+            'practice': 'Trips', 
+            'stats': 'Earnings',
+            'profile': 'Settings'
+        };
+        
+        return {
+            currentPage: this.currentTab,
+            currentTitle: pageTitles[this.currentTab],
+            currentIndex: currentIndex,
+            totalPages: this.pageOrder.length,
+            canSwipeLeft: currentIndex < this.pageOrder.length - 1,
+            canSwipeRight: currentIndex > 0
+        };
     }
 }
 
