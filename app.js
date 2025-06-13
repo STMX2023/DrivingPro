@@ -14,6 +14,10 @@ class DrivingProApp {
         this.currentTheme = 'light';
         this.weatherData = {};
         this.weatherApiKey = 'e65d53c6'; // HG Weather API key
+        this.homePage = null; // Will be initialized when needed
+        this.tripsPage = null; // Will be initialized when needed
+        this.earningsPage = null; // Will be initialized when needed
+        this.settingsPage = null; // Will be initialized when needed
         this.init();
     }
 
@@ -24,6 +28,9 @@ class DrivingProApp {
         // Initialize location first, then weather
         await this.initializeLocationSystem();
         await this.initializeWeatherSystem();
+        
+        // Load home page content on startup since it's the default tab
+        this.loadHomePage();
         
         this.setupEventListeners();
         this.setupPWA();
@@ -1041,6 +1048,17 @@ class DrivingProApp {
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
 
+        // Handle special cases for modular content loading
+        if (tabName === 'home') {
+            this.loadHomePage();
+        } else if (tabName === 'practice') {
+            this.loadTripsPage();
+        } else if (tabName === 'stats') {
+            this.loadEarningsPage();
+        } else if (tabName === 'profile') {
+            this.loadSettingsPage();
+        }
+
         // Update content
         document.querySelectorAll('.content-section').forEach(section => {
             section.classList.remove('active');
@@ -1054,6 +1072,78 @@ class DrivingProApp {
         
         // Add haptic feedback (if supported)
         this.hapticFeedback('light');
+    }
+
+    loadHomePage() {
+        const homeSection = document.getElementById('home');
+        if (homeSection && window.HomePage) {
+            // Initialize home page if not already done
+            if (!this.homePage) {
+                this.homePage = new window.HomePage();
+            }
+            
+            // Clear existing content and load new modular content
+            homeSection.innerHTML = this.homePage.render();
+            
+            // Initialize home page functionality
+            setTimeout(() => {
+                this.homePage.initialize();
+            }, 100); // Small delay to ensure DOM is updated
+        }
+    }
+
+    loadTripsPage() {
+        const tripsSection = document.getElementById('practice');
+        if (tripsSection && window.TripsPage) {
+            // Initialize trips page if not already done
+            if (!this.tripsPage) {
+                this.tripsPage = new window.TripsPage();
+            }
+            
+            // Clear existing content and load new modular content
+            tripsSection.innerHTML = this.tripsPage.render();
+            
+            // Initialize trips page functionality
+            setTimeout(() => {
+                this.tripsPage.initialize();
+            }, 100); // Small delay to ensure DOM is updated
+        }
+    }
+
+    loadEarningsPage() {
+        const earningsSection = document.getElementById('stats');
+        if (earningsSection && window.EarningsPage) {
+            // Initialize earnings page if not already done
+            if (!this.earningsPage) {
+                this.earningsPage = new window.EarningsPage();
+            }
+            
+            // Clear existing content and load new modular content
+            earningsSection.innerHTML = this.earningsPage.render();
+            
+            // Initialize earnings page functionality
+            setTimeout(() => {
+                this.earningsPage.initialize();
+            }, 100); // Small delay to ensure DOM is updated
+        }
+    }
+
+    loadSettingsPage() {
+        const settingsSection = document.getElementById('profile');
+        if (settingsSection && window.SettingsPage) {
+            // Initialize settings page if not already done
+            if (!this.settingsPage) {
+                this.settingsPage = new window.SettingsPage();
+            }
+            
+            // Clear existing content and load new modular content
+            settingsSection.innerHTML = this.settingsPage.render();
+            
+            // Initialize settings page functionality
+            setTimeout(() => {
+                this.settingsPage.initialize();
+            }, 100); // Small delay to ensure DOM is updated
+        }
     }
 
     handleCardClick(card, event) {

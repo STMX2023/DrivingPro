@@ -180,11 +180,11 @@ class SideMenu {
         const title = menuItem.querySelector('.menu-item-title').textContent;
         const tabId = menuItem.getAttribute('data-tab');
         
-        // Add click animation
+        // Add immediate click animation for instant feedback
         menuItem.style.transform = 'scale(0.95)';
         setTimeout(() => {
             menuItem.style.transform = '';
-        }, 150);
+        }, 100);
 
         // Add haptic feedback
         if (navigator.vibrate) {
@@ -193,15 +193,13 @@ class SideMenu {
 
         console.log(`Menu item clicked: ${title} (${tabId})`);
         
+        // Close menu immediately for instant response
+        this.closeMenu();
+        
         // Switch to the selected tab using the main app's method
         if (window.drivingProApp && tabId) {
             window.drivingProApp.switchTab(tabId);
         }
-        
-        // Close menu after selection
-        setTimeout(() => {
-            this.closeMenu();
-        }, 200);
     }
 
     // Public method to programmatically control menu
