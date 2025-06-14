@@ -625,6 +625,7 @@ class DrivingProApp {
         this.clearLoadingStates();
         this.updateCurrentWeatherIcon();
         this.updateForecastIcons();
+        this.autoAdjustWeatherGap();
     }
 
     clearLoadingStates() {
@@ -1067,6 +1068,9 @@ class DrivingProApp {
         
         // Setup swipe navigation
         this.setupSwipeNavigation();
+
+        // Adjust weather spacing on viewport changes
+        window.addEventListener('resize', () => this.autoAdjustWeatherGap());
     }
 
     switchTab(tabName) {
@@ -1760,6 +1764,38 @@ class DrivingProApp {
             canSwipeLeft: currentIndex < this.pageOrder.length - 1,
             canSwipeRight: currentIndex > 0
         };
+    }
+
+    /**
+     * Dynamically scales the gap between weather items so they all stay visible
+     * inside the header area without overlapping the minimum hamburger gap.
+     * Formula: gap = max(1px, floor((headerWidth - minGap - totalIconWidth) / (n-1)))
+     * If the available space is still too small the variable is set to 1px and
+     * horizontal scrolling will do the rest.
+     */
+    autoAdjustWeatherGap() {
+        const headerEl = document.querySelector('.header');
+        const timeline = document.getElementById('weatherTimeline');
+        if (!headerEl || !timeline) return;
+
+        const items = timeline.querySelectorAll('.weather-day');
+        if (items.length < 2) return; // nothing to space
+
+        const root = document.documentElement;
+        const styles = getComputedStyle(root);
+
+        const minGap = parseFloat(styles.getPropertyValue('--header-min-gap')) || 0;
+        const headerWidth = headerEl.clientWidth;
+
+        // Assume all items have the same width (includes icon + padding)
+        const itemWidth = items[0].getBoundingClientRect().width;
+        const totalItemsWidth = itemWidth * items.length;
+
+        let gap = Math.floor((headerWidth - minGap - totalItemsWidth) / (items.length - 1));
+
+        if (gap < 1) gap = 1; // keep at least 1px so flex-gap stays valid
+
+        root.style.setProperty('--weather-gap', `${gap}px`);
     }
 }
 
