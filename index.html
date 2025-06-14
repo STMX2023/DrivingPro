@@ -25,43 +25,44 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="hamburger-menu">
-                <div class="hamburger-icon"></div>
-            </div>
-            <div id="weatherTimeline" class="weather-timeline">
-                <!-- Current day (larger) -->
-                <div id="currentWeatherIcon" class="weather-day current-day">
-                    <div class="weather-loading"></div>
+        <!-- Main Content Wrapper - groups header and main content for responsive layout -->
+        <div class="main-content-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="hamburger-menu">
+                    <div class="hamburger-icon"></div>
                 </div>
-                <!-- Next 6 days (smaller) -->
-                <div id="forecastIcons" class="forecast-days">
-                    <!-- Generated dynamically -->
+                <div id="weatherTimeline" class="weather-timeline">
+                    <!-- Current day (larger) -->
+                    <div id="currentWeatherIcon" class="weather-day current-day">
+                        <div class="weather-loading"></div>
+                    </div>
+                    <!-- Next 6 days (smaller) -->
+                    <div id="forecastIcons" class="forecast-days">
+                        <!-- Generated dynamically -->
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="content-section active" id="home">
-                <!-- Home page content will be loaded dynamically by home-page.js -->
-            </div>
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="content-section active" id="home">
+                    <!-- Home page content will be loaded dynamically by home-page.js -->
+                </div>
 
-            <div class="content-section" id="practice">
-                <!-- Trips page content will be loaded dynamically by trips-page.js -->
-            </div>
+                <div class="content-section" id="practice">
+                    <!-- Trips page content will be loaded dynamically by trips-page.js -->
+                </div>
 
-            <div class="content-section" id="stats">
-                <!-- Earnings page content will be loaded dynamically by earnings-page.js -->
-            </div>
+                <div class="content-section" id="stats">
+                    <!-- Earnings page content will be loaded dynamically by earnings-page.js -->
+                </div>
 
-            <div class="content-section" id="profile">
-                <!-- Settings page content will be loaded dynamically by settings-page.js -->
-            </div>
-        </main>
-
-
+                <div class="content-section" id="profile">
+                    <!-- Settings page content will be loaded dynamically by settings-page.js -->
+                </div>
+            </main>
+        </div>
     </div>
 
     <script src="home-page.js?v=1.0.0"></script>

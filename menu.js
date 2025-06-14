@@ -1,16 +1,163 @@
 class SideMenu {
     constructor() {
         this.isOpen = false;
+        this.isCollapsed = false;
         this.drawer = null;
         this.overlay = null;
         this.hamburgerBtn = null;
+        this.isDesktop = false;
         this.init();
     }
 
     init() {
         this.createMenuStructure();
+        this.checkViewport();
         this.setupEventListeners();
+        this.setupResizeHandler();
+        
+        // Force mobile menu to be closed on startup
+        this.ensureProperInitialState();
+        
+        // Initialize proper positioning
+        setTimeout(() => {
+            this.ensureDesktopPositioning();
+        }, 50);
+        
         console.log('Side menu initialized');
+    }
+    
+    ensureProperInitialState() {
+        // Wait for DOM to be fully ready
+        setTimeout(() => {
+            if (!this.isDesktop) {
+                // Force close state on mobile startup with debugging
+                this.isOpen = false;
+                
+                if (this.overlay) {
+                    this.overlay.classList.remove('active');
+                    console.log('Overlay active class removed');
+                }
+                
+                if (this.drawer) {
+                    this.drawer.classList.remove('active');
+                    this.drawer.classList.remove('collapsed');
+                    console.log('Drawer active and collapsed classes removed');
+                }
+                
+                document.body.classList.remove('menu-open');
+                console.log('Mobile menu forced to closed state on startup');
+                
+                // Double-check event listeners
+                this.verifyEventListeners();
+            }
+        }, 100); // Increased timeout for better DOM readiness
+    }
+    
+    verifyEventListeners() {
+        const closeBtn = this.drawer?.querySelector('.menu-close-btn');
+        console.log('Close button found:', !!closeBtn);
+        
+        if (closeBtn && !closeBtn.getAttribute('data-listener-attached')) {
+            closeBtn.addEventListener('click', () => {
+                console.log('Close button clicked');
+                this.closeMenu();
+            });
+            closeBtn.setAttribute('data-listener-attached', 'true');
+            console.log('Close button listener re-attached');
+        }
+    }
+
+    checkViewport() {
+        this.isDesktop = window.innerWidth >= 768;
+        this.updateMenuState();
+    }
+
+    updateMenuState() {
+        if (!this.drawer) return;
+
+        if (this.isDesktop) {
+            // Desktop mode - persistent sidebar (always visible)
+            this.overlay.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            this.isOpen = true; // Sidebar is always "open" on desktop
+            
+            // Make sidebar visible and position it as first child of app-container
+            this.drawer.style.display = 'flex';
+            
+            // Apply collapsed state if previously set
+            if (this.isCollapsed) {
+                this.drawer.classList.add('collapsed');
+            } else {
+                this.drawer.classList.remove('collapsed');
+            }
+            
+            // Ensure it's properly positioned in the layout
+            this.ensureDesktopPositioning();
+        } else {
+            // Mobile mode - overlay menu
+            this.drawer.classList.remove('collapsed');
+            this.isCollapsed = false;
+            
+            // Ensure proper mobile positioning
+            this.ensureMobilePositioning();
+            
+            // Explicitly ensure mobile menu is closed on startup
+            if (this.isOpen) {
+                this.overlay.classList.add('active');
+                this.drawer.classList.add('active');
+                document.body.classList.add('menu-open');
+            } else {
+                // Force closed state on mobile
+                this.overlay.classList.remove('active');
+                this.drawer.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+        }
+    }
+    
+    ensureDesktopPositioning() {
+        if (!this.isDesktop || !this.drawer) return;
+        
+        const mainContentWrapper = document.querySelector('.main-content-wrapper');
+        if (mainContentWrapper && this.drawer.parentNode !== mainContentWrapper) {
+            // Move sidebar to be first child of main-content-wrapper for proper flex layout
+            mainContentWrapper.insertBefore(this.drawer, mainContentWrapper.firstChild);
+            console.log('Sidebar moved to main-content-wrapper for desktop layout');
+        }
+        
+        // Ensure sidebar is visible on desktop
+        this.drawer.style.display = 'flex';
+        this.drawer.style.position = 'relative';
+    }
+    
+    ensureMobilePositioning() {
+        if (this.isDesktop || !this.drawer) return;
+        
+        if (this.drawer.parentNode !== document.body) {
+            // Move sidebar back to body for mobile overlay
+            document.body.appendChild(this.drawer);
+            console.log('Sidebar moved to body for mobile overlay');
+        }
+        
+        // Reset desktop styles
+        this.drawer.style.display = '';
+        this.drawer.style.position = '';
+    }
+
+    setupResizeHandler() {
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const wasDesktop = this.isDesktop;
+                this.checkViewport();
+                
+                // Log state changes for debugging
+                if (wasDesktop !== this.isDesktop) {
+                    console.log(`Viewport changed: ${this.isDesktop ? 'Desktop' : 'Mobile'} mode`);
+                }
+            }, 250);
+        });
     }
 
     createMenuStructure() {
@@ -104,13 +251,15 @@ class SideMenu {
         this.drawer.appendChild(menuHeader);
         this.drawer.appendChild(menuItems);
 
-        // Add to DOM
+        // Add to DOM - sidebar goes to app-container for desktop layout, overlay to body
         document.body.appendChild(this.overlay);
+        
+        // Initially add to body, will be moved to app-container for desktop in updateMenuState
         document.body.appendChild(this.drawer);
     }
 
     setupEventListeners() {
-        // Get hamburger button
+        // Get hamburger button with null check
         this.hamburgerBtn = document.querySelector('.hamburger-menu');
         
         if (this.hamburgerBtn) {
@@ -121,22 +270,28 @@ class SideMenu {
                 }
                 this.toggleMenu();
             });
+        } else {
+            console.warn('Hamburger button not found');
         }
 
-        // Close button
-        const closeBtn = this.drawer.querySelector('.menu-close-btn');
+        // Close button with null check
+        const closeBtn = this.drawer?.querySelector('.menu-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.closeMenu());
         }
 
         // Overlay click to close
-        this.overlay.addEventListener('click', () => this.closeMenu());
+        if (this.overlay) {
+            this.overlay.addEventListener('click', () => this.closeMenu());
+        }
 
-        // Menu item clicks
-        const menuItems = this.drawer.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => this.handleMenuItemClick(e));
-        });
+        // Menu item clicks with null check
+        const menuItems = this.drawer?.querySelectorAll('.menu-item');
+        if (menuItems) {
+            menuItems.forEach(item => {
+                item.addEventListener('click', (e) => this.handleMenuItemClick(e));
+            });
+        }
 
         // Escape key to close
         document.addEventListener('keydown', (e) => {
@@ -147,14 +302,34 @@ class SideMenu {
     }
 
     toggleMenu() {
-        if (this.isOpen) {
-            this.closeMenu();
+        if (this.isDesktop) {
+            // Desktop: toggle collapsed state
+            this.isCollapsed = !this.isCollapsed;
+            
+            if (this.isCollapsed) {
+                this.drawer.classList.add('collapsed');
+            } else {
+                this.drawer.classList.remove('collapsed');
+            }
+            
+            console.log(`Desktop sidebar ${this.isCollapsed ? 'collapsed' : 'expanded'}`);
         } else {
-            this.openMenu();
+            // Mobile: toggle overlay menu
+            if (this.isOpen) {
+                this.closeMenu();
+            } else {
+                this.openMenu();
+            }
         }
     }
 
     openMenu() {
+        // Only allow opening overlay menu on mobile
+        if (this.isDesktop) {
+            console.log('Attempted to open menu on desktop - ignoring');
+            return;
+        }
+        
         this.isOpen = true;
         this.overlay.classList.add('active');
         this.drawer.classList.add('active');
@@ -169,21 +344,36 @@ class SideMenu {
             navigator.vibrate(50);
         }
         
-        console.log('Menu opened');
+        console.log('Mobile menu opened');
     }
 
     closeMenu() {
-        this.isOpen = false;
-        this.overlay.classList.remove('active');
-        this.drawer.classList.remove('active');
-        document.body.classList.remove('menu-open');
+        // Always allow closing on mobile, but don't interfere with desktop sidebar
+        if (this.isDesktop) {
+            console.log('Attempted to close menu on desktop - ignoring');
+            return;
+        }
         
-        console.log('Menu closed');
+        console.log('Closing mobile menu...');
+        this.isOpen = false;
+        
+        if (this.overlay) {
+            this.overlay.classList.remove('active');
+            console.log('Overlay active class removed');
+        }
+        
+        if (this.drawer) {
+            this.drawer.classList.remove('active');
+            console.log('Drawer active class removed');
+        }
+        
+        document.body.classList.remove('menu-open');
+        console.log('Mobile menu successfully closed');
     }
 
     handleMenuItemClick(event) {
         const menuItem = event.currentTarget;
-        const title = menuItem.querySelector('.menu-item-title').textContent;
+        const title = menuItem.querySelector('.menu-item-title')?.textContent;
         const tabId = menuItem.getAttribute('data-tab');
         
         // Add immediate click animation for instant feedback
@@ -199,8 +389,10 @@ class SideMenu {
 
         console.log(`Menu item clicked: ${title} (${tabId})`);
         
-        // Close menu immediately for instant response
-        this.closeMenu();
+        // Close menu only on mobile
+        if (!this.isDesktop) {
+            this.closeMenu();
+        }
         
         // Switch to the selected tab using the main app's method
         if (window.drivingProApp && tabId) {
@@ -210,21 +402,33 @@ class SideMenu {
 
     // Public method to programmatically control menu
     setMenuState(isOpen) {
-        if (isOpen) {
-            this.openMenu();
+        if (this.isDesktop) {
+            // On desktop, control collapsed state instead
+            this.isCollapsed = !isOpen;
+            this.updateMenuState();
         } else {
-            this.closeMenu();
+            // On mobile, control overlay menu
+            if (isOpen) {
+                this.openMenu();
+            } else {
+                this.closeMenu();
+            }
         }
     }
 
     // Get current menu state
     getMenuState() {
+        if (this.isDesktop) {
+            return !this.isCollapsed; // Return true if expanded, false if collapsed
+        }
         return this.isOpen;
     }
 
     // Update active menu item based on current tab
     updateActiveMenuItem(activeTabId) {
-        const menuItems = this.drawer.querySelectorAll('.menu-item');
+        const menuItems = this.drawer?.querySelectorAll('.menu-item');
+        if (!menuItems) return;
+        
         menuItems.forEach(item => {
             const tabId = item.getAttribute('data-tab');
             if (tabId === activeTabId) {
@@ -241,6 +445,16 @@ class SideMenu {
             return window.drivingProApp.currentTab || 'home';
         }
         return 'home';
+    }
+
+    // Public getter for responsive state
+    getIsDesktop() {
+        return this.isDesktop;
+    }
+
+    // Public getter for collapsed state
+    getIsCollapsed() {
+        return this.isCollapsed;
     }
 }
 
