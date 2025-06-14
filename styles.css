@@ -237,9 +237,14 @@ body {
     transform: scale(0.95);
 }
 
-.hamburger-menu svg {
-    color: var(--text-primary);
+.hamburger-icon {
+    width: 24px;
+    height: 24px;
     transition: all 0.3s var(--ease-out-cubic);
+    background-image: url('icons/icons8-grip-lines-48-LightMode.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 /* === SIDE DRAWER MENU === */
@@ -1238,8 +1243,8 @@ body.menu-open {
     background: rgba(255, 255, 255, 0.1);
 }
 
-[data-theme="dark"] .hamburger-menu svg {
-    color: var(--text-primary);
+[data-theme="dark"] .hamburger-icon {
+    background-image: url('icons/icons8-grip-lines-DarkMode-48.png');
 }
 
 [data-theme="dark"] .menu-overlay {
@@ -1410,8 +1415,8 @@ body.menu-open {
         background: rgba(255, 255, 255, 0.1);
     }
     
-    :root:not([data-theme]) .hamburger-menu svg {
-        color: var(--text-primary);
+    :root:not([data-theme]) .hamburger-icon {
+        background-image: url('icons/icons8-grip-lines-DarkMode-48.png');
     }
     
     :root:not([data-theme]) .menu-overlay {
